@@ -1,0 +1,84 @@
+name: Build FL Browser
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 (如 1.0.1)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm install
+          npm prune --production
+          
+      - name: Build Windows ZIP
+        run: npm run build:zip
+        
+      - name: Build Windows Installer
+        run: npm run build:installer
+        
+      - name: List output files
+        run: |
+          Get-ChildItem dist/ -File | ForEach-Object {
+            $size = [math]::Round($_.Length/1MB, 2)
+            Write-Host "📦 $($_.Name) - ${size} MB"
+          }
+          
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fl-browser-win-zip
+          path: dist/FL Browser-*-win.zip
+          retention-days: 30
+          
+      - name: Upload Installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fl-browser-win-installer
+          path: dist/FL-Browser-Setup-*.exe
+          retention-days: 30
+          
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/FL Browser-*-win.zip
+            dist/FL-Browser-Setup-*.exe
+          body: |
+            ## FL Browser ${{ github.ref_name }}
+            
+            ### 下载
+            
+            - **便携版** (ZIP) - 解压即可使用
+            - **安装版** (EXE) - 安装到系统中
+            
+            ### 更新日志
+            
+            - 自动构建发布
+            
+            ### 系统要求
+            
+            - Windows 10/11 (64位)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

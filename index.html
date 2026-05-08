@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>FL Browser</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+button>svg,button>svg>*,svg.svg-icon,svg.svg-icon>*,svg.svg-close,svg.svg-close>*{pointer-events:none!important}
+html,body{height:100%;overflow:hidden;font-family:"Segoe UI",system-ui,-apple-system,sans-serif}
+body{display:flex;flex-direction:column;--bg:#1e1e2e;--bg2:#181825;--bg3:#252536;--bg4:#313244;--bg5:#45475a;--text:#cdd6f4;--text2:#a6adc8;--text3:#6c7086;--border:#45475a;--accent:#89b4fa;--accent2:#74c7ec;--red:#f38ba8;--green:#a6e3a1;--yellow:#f9e2af;background:var(--bg);color:var(--text);transition:background .3s,color .3s}
+body.private{--bg:#11111b;--bg2:#0a0a0f;--bg3:#181825;--bg4:#1e1e2e;--bg5:#313244;--text:#cdd6f4;--text2:#9399b2;--text3:#585b70;--border:#313244;background:var(--bg)}
+body.light{--bg:#eff1f5;--bg2:#e6e9ef;--bg3:#fff;--bg4:#ccd0da;--bg5:#bcc0cc;--text:#4c4f69;--text2:#5c5f77;--text3:#9ca0b0;--border:#ccd0da;background:var(--bg);color:var(--text)}
+body.ocean{--bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--bg4:#475569;--bg5:#64748b;--text:#f1f5f9;--text2:#cbd5e1;--text3:#94a3b8;--border:#475569;--accent:#0ea5e9;--accent2:#22d3ee;--red:#f87171;--green:#4ade80;--yellow:#fbbf24;background:var(--bg)}
+body.forest{--bg:#052e16;--bg2:#14532d;--bg3:#166534;--bg4:#15803d;--bg5:#16a34a;--text:#dcfce7;--text2:#bbf7d0;--text3:#86efac;--border:#166534;--accent:#22c55e;--accent2:#4ade80;--red:#ef4444;--green:#84cc16;--yellow:#eab308;background:var(--bg)}
+body.sunset{--bg:#450a0a;--bg2:#7f1d1d;--bg3:#991b1b;--bg4:#b91c1c;--bg5:#dc2626;--text:#fecaca;--text2:#fca5a5;--text3:#f87171;--border:#991b1b;--accent:#ef4444;--accent2:#f87171;--red:#fca5a5;--green:#4ade80;--yellow:#fbbf24;background:var(--bg)}
+body.neon{--bg:#0f0f23;--bg2:#1a1a3e;--bg3:#2d2d6d;--bg4:#3d3d8f;--bg5:#4d4dbf;--text:#e0e0ff;--text2:#b0b0ff;--text3:#8080cc;--border:#3d3d8f;--accent:#8b5cf6;--accent2:#a78bfa;--red:#f472b6;--green:#34d399;--yellow:#fbbf24;background:var(--bg)}
+body.light .titlebar{background:var(--bg3)}
+body.light .tabbar{background:var(--bg2)}
+body.light .toolbar{background:var(--bg3)}
+body.light .address-bar{background:var(--bg2);border-color:var(--border)}
+body.light .btn:hover{background:rgba(0,0,0,.06)}
+body.light .tab{background:var(--bg4)}
+body.light .tab.active{background:var(--bg3);color:var(--text)}
+body.light .popup-menu,body.light .security-panel{background:var(--bg3);box-shadow:0 8px 32px rgba(0,0,0,.15)}
+body.light .newtab{background:linear-gradient(135deg,#eff1f5,#e6e9ef,#ccd0da)}
+body.light .newtab-title{color:var(--text)}
+body.light .search-box{background:var(--bg3);border-color:var(--border)}
+body.light .search-input{color:var(--text)}
+body.light .search-input::placeholder{color:var(--text3)}
+body.light .shortcut-item{background:var(--bg3)}
+body.light .shortcut-item:hover{background:var(--bg4)}
+body.light .shortcut-name{color:var(--text2)}
+body.light .sidebar-tab{background:var(--bg4)}
+body.light .sidebar-tab.active{background:var(--bg3)}
+body.light .bkm-item{color:var(--text2)}
+body.light .bkm-item:hover{background:rgba(0,0,0,.06)}
+body.light .popup-menu-item:hover{background:rgba(0,0,0,.06)}
+body.light .settings-nav-item:hover{background:rgba(0,0,0,.06)}
+body.light .settings-nav-item.active{background:var(--bg5);color:var(--text)}
+
+.svg-icon{stroke:var(--text2);fill:var(--text2)}
+.svg-icon path{stroke:var(--text2);fill:var(--text2)}
+.svg-icon rect{stroke:var(--text2);fill:var(--text2)}
+.svg-icon circle{stroke:var(--text2);fill:var(--text2)}
+.svg-close{stroke:var(--text);fill:var(--text)}
+.svg-close path{stroke:var(--text);fill:var(--text)}
+body.light .svg-icon{stroke:var(--text2);fill:var(--text2)}
+body.light .svg-icon path{stroke:var(--text2);fill:var(--text2)}
+body.light .svg-icon rect{stroke:var(--text2);fill:var(--text2)}
+body.light .svg-icon circle{stroke:var(--text2);fill:var(--text2)}
+body.light .svg-close{stroke:var(--text);fill:var(--text)}
+body.light .svg-close path{stroke:var(--text);fill:var(--text)}
+
+.titlebar{height:34px;background:var(--bg2);display:flex;align-items:center;-webkit-app-region:drag;border-bottom:1px solid var(--border);z-index:500;flex-shrink:0}
+.window-title{font-size:12px;color:var(--text3);flex:1;padding-left:14px;user-select:none}
+.titlebar-btns{display:flex;-webkit-app-region:no-drag;height:100%}
+.titlebar-btn{width:46px;height:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;position:relative;z-index:501;-webkit-app-region:no-drag}
+.titlebar-btn:hover{background:rgba(128,128,128,.15)}
+.titlebar-btn.close:hover{background:#e81123}
+.titlebar-btn.close:hover svg{stroke:#fff;fill:#fff}
+.titlebar-btn.close:hover svg path{stroke:#fff;fill:#fff}
+
+.bookmarks-bar{height:32px;background:var(--bg);display:flex;align-items:center;padding:0 8px;border-bottom:1px solid var(--border);overflow:hidden;flex-shrink:0;gap:2px}
+.bookmarks-bar.hidden{display:none}
+.bkm-item{display:flex;align-items:center;gap:5px;padding:3px 10px;font-size:12px;color:var(--text2);border-radius:6px;cursor:pointer;white-space:nowrap;transition:background .15s;position:relative}
+.bkm-item:hover{background:rgba(128,128,128,.1);color:var(--text)}
+.bkm-delete{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:16px;height:16px;display:none;align-items:center;justify-content:center;border-radius:4px;background:rgba(243,139,168,.15);cursor:pointer;opacity:.7}
+.bkm-item:hover .bkm-delete{display:flex}
+.bkm-delete:hover{opacity:1}
+
+.tabbar{height:38px;background:var(--bg2);display:flex;align-items:flex-end;padding:0 8px;border-bottom:1px solid var(--border);flex-shrink:0;position:relative}
+.tabs{display:flex;flex:1;overflow-x:auto;overflow-y:hidden;gap:2px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:var(--bg4);padding:0 10px 0 14px;height:34px;display:flex;align-items:center;border-radius:10px 10px 0 0;cursor:pointer;min-width:80px;max-width:210px;transition:background .15s;position:relative;user-select:none;font-size:12px;gap:4px;flex-shrink:0}
+.tab.active{background:var(--bg);color:var(--text);font-weight:500}
+.tab:hover:not(.active){background:var(--bg5)}
+.tab-favicon{width:16px;height:16px;border-radius:2px;flex-shrink:0;font-size:11px;display:flex;align-items:center;justify-content:center}
+.tab-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tab-close{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0;transition:opacity .15s,background .15s}
+.tab:hover .tab-close,.tab.active .tab-close{opacity:1}
+.tab-close:hover{background:rgba(128,128,128,.2)}
+.tab-sleeping{opacity:.5}
+.tab-group-indicator{position:absolute;bottom:0;left:8px;right:8px;height:3px;border-radius:3px 3px 0 0}
+.add-tab{width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;transition:background .15s;flex-shrink:0;margin-left:2px}
+.add-tab:hover{background:rgba(128,128,128,.12)}
+.tab-actions-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;transition:background .15s;flex-shrink:0;margin-left:2px}
+.tab-actions-btn:hover{background:rgba(128,128,128,.12)}
+
+.vertical-tabs-sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);display:none;flex-direction:column;flex-shrink:0;overflow:hidden}
+.vertical-tabs-sidebar.show{display:flex}
+.vertical-tabs-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)}
+.vertical-tabs-header span{font-size:13px;font-weight:600;color:var(--text)}
+.vertical-tabs-list{flex:1;overflow-y:auto;padding:4px}
+.sidebar-tab{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--text2);transition:background .15s;margin-bottom:1px}
+.sidebar-tab:hover{background:var(--bg4)}
+.sidebar-tab.active{background:var(--bg5);color:var(--text)}
+.sidebar-tab-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.toolbar{height:46px;background:var(--bg);display:flex;align-items:center;padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.btn{width:34px;height:34px;border:none;background:transparent;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .15s;color:var(--text2);flex-shrink:0}
+.btn:hover{background:rgba(128,128,128,.1)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn:disabled:hover{background:transparent}
+.btn.active{background:rgba(137,180,250,.15);color:var(--accent)}
+
+.address-bar{flex:1;display:flex;align-items:center;background:var(--bg3);border-radius:22px;height:36px;padding:0 10px;margin:0 6px;border:1px solid transparent;transition:border-color .2s,background .2s}
+.address-bar:focus-within{background:var(--bg);border-color:var(--accent)}
+.address-bar:hover:not(:focus-within){background:var(--bg4)}
+.address-input{flex:1;border:none;outline:none;background:transparent;color:var(--text);font-size:13px;min-width:0}
+.address-input::placeholder{color:var(--text3)}
+.address-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg3);border:1px solid var(--border);border-radius:12px;max-height:300px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:3000;display:none}
+.address-suggestions.show{display:block}
+.suggestion-item{display:flex;align-items:center;gap:10px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text);transition:background .1s}
+.suggestion-item:hover,.suggestion-item.highlighted{background:var(--accent);color:var(--bg)}
+.suggestion-item .sug-icon{width:16px;text-align:center;flex-shrink:0}
+.suggestion-item .sug-url{color:var(--text3);font-size:11px}
+.suggestion-item:hover .sug-url,.suggestion-item.highlighted .sug-url{color:var(--bg2)}
+.address-secure{display:flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s}
+.address-secure:hover{background:rgba(128,128,128,.1)}
+.address-secure.secure{color:var(--green)}
+.address-secure.insecure{color:var(--red)}
+
+.content{flex:1;position:relative;background:var(--bg);overflow:hidden}
+.fullscreen .titlebar,.fullscreen .tabbar,.fullscreen .toolbar,.fullscreen .bookmarks-bar{display:none}
+.page{display:none;position:absolute;top:0;left:0;width:100%;height:100%}
+.page.active{display:block}
+webview{width:100%;height:100%}
+
+.newtab{background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 50%,var(--bg3) 100%);display:flex;flex-direction:column;align-items:center;padding-top:6%;min-height:100%}
+.newtab-logo{font-size:42px;font-weight:200;color:var(--text);letter-spacing:6px;margin-bottom:8px;user-select:none}
+.newtab-subtitle{font-size:13px;color:var(--text3);margin-bottom:28px}
+.search-box{width:560px;max-width:90%;height:46px;background:var(--bg3);border:1px solid var(--border);border-radius:24px;display:flex;align-items:center;padding:0 16px;transition:border-color .2s,box-shadow .2s}
+.search-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(137,180,250,.2)}
+.search-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px}
+.search-input::placeholder{color:var(--text3)}
+.quick-links{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;justify-content:center;max-width:700px}
+.quick-link{display:flex;flex-direction:column;align-items:center;padding:14px 12px;border-radius:12px;cursor:pointer;transition:all .2s;min-width:76px;text-decoration:none}
+.quick-link:hover{background:rgba(128,128,128,.1);transform:translateY(-3px)}
+.quick-link-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:8px;font-weight:700}
+.quick-link-icon svg{pointer-events:none}
+.quick-link-add{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--border);color:var(--text3);font-size:22px;margin-bottom:8px;transition:border-color .2s,color .2s}
+.quick-link:hover .quick-link-add{border-color:var(--accent);color:var(--accent)}
+.quick-link-name{font-size:11px;color:var(--text2);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+
+.settings{display:flex;height:100%;background:var(--bg)}
+.settings-sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.settings-logo{padding:16px 18px;font-size:15px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
+.settings-nav{flex:1;overflow-y:auto;padding:8px}
+.settings-nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left}
+.settings-nav-item:hover{background:rgba(128,128,128,.08);color:var(--text)}
+.settings-nav-item.active{background:var(--bg5);color:var(--text);font-weight:500}
+.settings-main{flex:1;overflow-y:auto}
+.settings-header{padding:28px 32px 20px;border-bottom:1px solid var(--border)}
+.settings-header h1{font-size:26px;font-weight:400;color:var(--text)}
+.settings-panel{padding:24px 32px;display:none}
+.settings-panel.active{display:block}
+.settings-section{margin-bottom:36px}
+.settings-section-title{font-size:16px;font-weight:500;color:var(--text);margin-bottom:6px}
+.settings-section-desc{font-size:12px;color:var(--text3);margin-bottom:16px}
+.settings-card{background:var(--bg3);border-radius:12px;overflow:hidden}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);min-height:52px}
+.setting-row:last-child{border-bottom:none}
+.setting-info{flex:1;min-width:0;padding-right:16px}
+.setting-label{font-size:13px;color:var(--text);line-height:1.4}
+.setting-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+.btn-primary{background:var(--accent);color:var(--bg);border:none;border-radius:6px;padding:8px 18px;font-size:13px;cursor:pointer;transition:opacity .2s;font-weight:500}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{background:var(--bg5);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;transition:background .2s}
+.btn-secondary:hover{background:var(--border)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid var(--red);border-radius:6px;padding:8px 16px;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-danger:hover{background:var(--red);color:#fff}
+
+.toggle-switch{width:42px;height:24px;background:var(--text3);border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle-switch.on{background:var(--accent)}
+.toggle-switch::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .25s}
+.toggle-switch.on::after{transform:translateX(18px)}
+.setting-select{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 10px;font-size:13px;outline:none;cursor:pointer}
+.setting-select:focus{border-color:var(--accent)}
+.setting-input{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 12px;font-size:13px;outline:none;width:220px}
+.setting-input:focus{border-color:var(--accent)}
+
+.theme-options{display:flex;gap:20px}
+.theme-option{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;border-radius:10px;transition:all .15s;border:2px solid transparent}
+.theme-option:hover{background:rgba(128,128,128,.06)}
+.theme-option.active{border-color:var(--accent);background:rgba(137,180,250,.08)}
+.theme-preview{width:52px;height:52px;border-radius:12px;border:1px solid var(--border)}
+.theme-option span{font-size:12px;color:var(--text2)}
+
+.popup-menu{position:fixed;top:126px;right:10px;width:300px;background:var(--bg3);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.35);display:none;border:1px solid var(--border);z-index:2000;max-height:78vh;overflow-y:auto;padding:6px}
+.popup-menu.show{display:block}
+.popup-menu-item{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;font-size:13px;color:var(--text);border-radius:6px;transition:background .12s;border:none;background:none;width:100%;text-align:left}
+.popup-menu-item:hover{background:rgba(128,128,128,.1)}
+.popup-menu-item:active{background:rgba(128,128,128,.15)}
+.popup-menu-divider{height:1px;background:var(--border);margin:5px 8px}
+.popup-menu-shortcut{margin-left:auto;font-size:11px;color:var(--text3)}
+.popup-menu-icon{width:20px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+.security-panel{position:fixed;top:126px;left:10px;width:360px;background:var(--bg3);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.35);display:none;border:1px solid var(--border);z-index:2000;overflow:hidden}
+.history-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg3);border-radius:10px;margin-bottom:6px;transition:background .15s}
+.history-item:hover{background:var(--bg4)}
+.history-item-content{flex:1;min-width:0;cursor:pointer}
+.history-item-title{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-item-url{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-item-time{font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap}
+.history-item-delete{opacity:0;background:transparent;border:1px solid var(--border);color:var(--text3);padding:4px 10px;font-size:11px;border-radius:6px;cursor:pointer;transition:all .15s}
+.history-item:hover .history-item-delete{opacity:1}
+.history-item-delete:hover{background:var(--red);color:var(--bg);border-color:var(--red)}
+.history-actions{display:flex;align-items:center;margin-bottom:16px}
+.history-group{margin-bottom:20px}
+.history-group-label{font-size:12px;font-weight:600;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.security-panel-header{padding:22px;text-align:center;border-bottom:1px solid var(--border)}
+.security-panel-icon{width:56px;height:56px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center}
+.security-panel-icon.secure{background:rgba(166,227,161,.15)}
+.security-panel-icon.insecure{background:rgba(243,139,168,.15)}
+.security-panel-title{font-size:15px;font-weight:600;color:var(--text)}
+.security-panel-domain{font-size:12px;color:var(--text3);margin-top:4px;word-break:break-all}
+.security-panel-section{padding:16px 18px;border-bottom:1px solid var(--border)}
+.security-panel-section:last-child{border-bottom:none}
+.security-panel-section-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.security-panel-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;color:var(--text)}
+.security-panel-status{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500}
+.security-panel-status.blocked{background:rgba(243,139,168,.15);color:var(--red)}
+.security-panel-status.allowed{background:rgba(166,227,161,.15);color:var(--green)}
+.security-panel-btn{width:100%;padding:11px;background:var(--accent);border:none;border-radius:8px;color:var(--bg);cursor:pointer;font-size:13px;font-weight:500;transition:opacity .2s;margin:4px 18px 18px;width:calc(100% - 36px)}
+.security-panel-btn:hover{opacity:.85}
+.security-panel.show{display:block}
+
+.reader-mode{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:3000;display:none;flex-direction:column}
+.reader-mode.show{display:flex}
+.reader-header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);flex-shrink:0}
+.reader-title{font-size:15px;font-weight:600;color:var(--text)}
+.reader-controls{display:flex;align-items:center;gap:4px}
+.reader-btn{width:36px;height:36px;border:none;background:transparent;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background .15s;font-size:14px}
+.reader-btn:hover{background:rgba(128,128,128,.1)}
+.reader-content{flex:1;overflow-y:auto;padding:50px 18%;color:var(--text);font-size:17px;line-height:1.8;max-width:900px;margin:0 auto;width:100%}
+.reader-content h1{font-size:30px;font-weight:500;margin-bottom:24px;color:var(--text);line-height:1.3}
+.reader-content p{margin-bottom:18px}
+
+.read-aloud-panel{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--bg3);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.4);z-index:2600;border:1px solid var(--border);min-width:320px}
+.read-aloud-panel.hidden{display:none}
+.read-aloud-btn{width:32px;height:32px;border:none;background:transparent;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all .15s}
+.read-aloud-btn:hover{background:rgba(128,128,128,.1)}
+.read-aloud-btn.active{background:rgba(137,180,250,.15);color:var(--accent)}
+.read-aloud-btn.play{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--bg)}
+.read-aloud-btn.play:hover{opacity:.85}
+.read-aloud-separator{width:1px;height:24px;background:var(--border)}
+.read-aloud-select{background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 10px;font-size:12px;outline:none;cursor:pointer;width:120px}
+.read-aloud-select:focus{border-color:var(--accent)}
+.read-aloud-speed{display:flex;align-items:center;gap:8px}
+.read-aloud-speed input[type="range"]{width:100px;height:4px;background:var(--border);border-radius:2px;outline:none;cursor:pointer}
+.read-aloud-speed input[type="range"]::-webkit-slider-thumb{width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer}
+.read-aloud-speed span{font-size:12px;color:var(--text3);min-width:35px}
+
+.translate-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg3);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.4);z-index:2700;border:1px solid var(--border);min-width:420px;max-width:600px;width:90%;max-height:80vh;display:none;flex-direction:column}
+.translate-panel.show{display:flex}
+.translate-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.translate-title{font-size:15px;font-weight:600;color:var(--text)}
+.translate-close{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background .15s}
+.translate-close:hover{background:rgba(128,128,128,.1)}
+.translate-body{flex:1;overflow-y:auto;padding:16px 20px}
+.translate-input-row{display:flex;gap:8px;margin-bottom:12px}
+.translate-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;outline:none;resize:none;font-family:inherit;min-height:60px}
+.translate-input:focus{border-color:var(--accent)}
+.translate-arrow{display:flex;align-items:center;color:var(--text3);cursor:pointer;padding:8px;border-radius:6px;transition:all .15s}
+.translate-arrow:hover{background:rgba(128,128,128,.1);color:var(--accent)}
+.translate-lang-row{display:flex;gap:12px;margin-bottom:12px}
+.translate-lang-select{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:12px;outline:none;cursor:pointer}
+.translate-lang-select:focus{border-color:var(--accent)}
+.translate-result{background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:12px 14px;color:var(--text);font-size:14px;line-height:1.6;min-height:60px}
+.translate-actions{display:flex;gap:8px;padding:16px 20px;border-top:1px solid var(--border);flex-shrink:0}
+.translate-btn{flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .2s}
+.translate-btn.primary{background:var(--accent);color:var(--bg)}
+.translate-btn.secondary{background:var(--bg);border:1px solid var(--border);color:var(--text)}
+.translate-btn:hover{opacity:.85}
+.translate-history{margin-top:16px}
+.translate-history-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.translate-history-list{max-height:120px;overflow-y:auto}
+.translate-history-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:6px;margin-bottom:6px;cursor:pointer;transition:background .15s}
+.translate-history-item:hover{background:var(--bg4)}
+.translate-history-text{font-size:12px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.translate-history-lang{font-size:10px;color:var(--text3);margin-left:8px}
+.translate-history-delete{opacity:0;transition:opacity .15s;color:var(--red)}
+.translate-history-item:hover .translate-history-delete{opacity:1}
+
+.find-bar{position:fixed;top:calc(50% - 24px);left:50%;transform:translateX(-50%);background:var(--bg3);border-radius:12px;padding:8px;display:flex;align-items:center;gap:8px;box-shadow:0 12px 40px rgba(0,0,0,.4);z-index:2500;border:1px solid var(--border);min-width:380px}
+.find-bar.hidden{display:none}
+.find-bar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(137,180,250,.2)}
+.find-input-wrapper{flex:1;display:flex;align-items:center;background:var(--bg);border-radius:8px;padding:4px 10px}
+.find-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:13px;width:200px}
+.find-input::placeholder{color:var(--text3)}
+.find-count{font-size:11px;color:var(--text3);min-width:40px;text-align:center;padding:4px 8px;background:var(--bg);border-radius:6px}
+.find-count.highlight{color:var(--accent);font-weight:500}
+.find-btns{display:flex;gap:2px}
+.find-btn{width:28px;height:28px;border:none;background:transparent;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background .15s}
+.find-btn:hover,.find-btn.active{background:rgba(137,180,250,.15);color:var(--accent)}
+.find-close{cursor:pointer;padding:4px;border-radius:4px;transition:background .15s;display:flex}
+.find-close:hover{background:rgba(128,128,128,.1)}
+.find-options{display:flex;gap:4px;margin-left:4px}
+.find-option{width:24px;height:24px;border:none;background:transparent;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s;font-size:11px;font-weight:600}
+.find-option.active{color:var(--accent);background:rgba(137,180,250,.15)}
+
+.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:5000;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+.toast{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg3);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.3);opacity:0;transform:translateY(12px);transition:all .25s;pointer-events:auto;border:1px solid var(--border)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast-msg{font-size:12px;color:var(--text)}
+.toast.success{border-left:3px solid var(--green)}
+.toast.warning{border-left:3px solid var(--yellow)}
+.toast.info{border-left:3px solid var(--accent)}
+
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);z-index:4000;display:flex;align-items:center;justify-content:center}
+.dialog{background:var(--bg3);border-radius:16px;padding:28px 32px;min-width:380px;max-width:520px;color:var(--text);border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.dialog h2{font-size:17px;font-weight:500;margin-bottom:18px}
+.dialog-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:22px}
+.dialog select,.dialog input{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;width:100%}
+.dialog select:focus,.dialog input:focus{border-color:var(--accent);outline:none}
+
+.tab-preview{position:fixed;pointer-events:none;z-index:6000;background:var(--bg3);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);border:1px solid var(--border);padding:12px;display:none;min-width:260px}
+.tab-preview.show{display:block}
+.tab-preview .preview-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
+.tab-preview .preview-url{font-size:11px;color:var(--text3);word-break:break-all}
+.tab-preview .preview-img{width:240px;height:140px;background:var(--bg);border-radius:4px;margin-top:8px}
+
+.split-pane{display:flex;height:100%}
+.split-pane .pane{flex:1;overflow:hidden;position:relative}
+.split-pane .pane-divider{width:4px;background:var(--border);cursor:col-resize;flex-shrink:0;transition:background .15s}
+.split-pane .pane-divider:hover{background:var(--accent)}
+
+.progress-bar{position:absolute;top:0;left:0;height:3px;background:var(--accent);z-index:100;transition:width .3s;width:0;border-radius:0 2px 2px 0}
+.progress-bar.done{background:var(--green);width:100%!important;opacity:0;transition:opacity .5s}
+</style>
+</head>
+<body>
+<div class="titlebar">
+<span class="window-title">FL Browser</span>
+<div class="titlebar-btns">
+<div class="titlebar-btn" id="btnMin"><svg width="12" height="12" viewBox="0 0 12 12" class="svg-icon"><rect x="1" y="5.5" width="10" height="1.5" rx=".75"/></svg></div>
+<div class="titlebar-btn" id="btnMax"><svg width="12" height="12" viewBox="0 0 12 12" class="svg-icon"><rect x="1.5" y="1.5" width="9" height="9" rx="1" fill="none" stroke-width="1.3"/></svg></div>
+<div class="titlebar-btn close" id="btnClose"><svg width="12" height="12" viewBox="0 0 12 12" class="svg-close"><path d="M2 2L10 10M10 2L2 10" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+</div></div>
+
+<div class="bookmarks-bar hidden" id="bookmarksBar"></div>
+
+<div class="tabbar">
+<div class="tabs" id="tabsContainer"></div>
+<div class="tab-actions-btn hidden" id="tabActionsBtn"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></div>
+<div class="add-tab" id="btnAddTab"><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+</div>
+
+<div class="toolbar">
+<button class="btn" id="btnBack" disabled><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/></svg></button>
+<button class="btn" id="btnForward" disabled><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M12 4l-1.4 1.4L16.2 11H4v2h12.2l-5.6 5.6L12 20l8-8z"/></svg></button>
+<button class="btn" id="btnRefresh"><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M17.65 6.35A7.96 7.96 0 0012 4a8 8 0 100 16 7.98 7.98 0 007.73-6h-2.08A5.99 5.99 0 0112 18a6 6 0 110-12 5.9 5.9 0 014.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+<button class="btn" id="btnHome"><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+<div class="address-bar" id="addressBarWrapper">
+<button class="btn" id="btnSecurity" style="width:28px;height:28px"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon" id="secSvg"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></button>
+<input type="text" class="address-input" id="urlInput" placeholder="搜索或输入网址" autocomplete="off" spellcheck="false">
+<div class="address-suggestions" id="urlSuggestions"></div>
+<button class="btn" id="btnBookmark" style="width:28px;height:28px"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon" id="bkmSvg"><path d="M17 3H7a2 2 0 00-2 2v16l7-3 7 3V5a2 2 0 00-2-2z"/></svg></button>
+<button class="btn" id="btnReader" style="width:28px;height:28px"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon"><path d="M18 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg></button>
+</div>
+<button class="btn" id="btnCollections"><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M22 16V4a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14a2 2 0 002 2h14v-2H4V6H2z"/></svg></button>
+<button class="btn" id="btnVerticalTab"><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg></button>
+<button class="btn" id="btnMenu"><svg width="18" height="18" viewBox="0 0 24 24" class="svg-icon"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg></button>
+</div>
+
+<div style="display:flex;flex:1;overflow:hidden">
+<div class="vertical-tabs-sidebar" id="verticalTabsSidebar">
+<div class="vertical-tabs-header"><span>标签页</span><button class="btn" id="btnCloseVerticalTabs" style="width:28px;height:28px"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div>
+<div class="vertical-tabs-list" id="verticalTabsList"></div>
+</div>
+<div class="content" id="contentArea"></div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="security-panel" id="securityPanel"></div>
+
+<div class="popup-menu" id="menuPopup">
+<button class="popup-menu-item" data-action="newtab"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span><span>新标签页</span><span class="popup-menu-shortcut">Ctrl+T</span></button>
+<button class="popup-menu-item" data-action="new-window"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM5 15h14v2H5v-2zm0-4h14v2H5v-2zm0-4h14v2H5V7z"/></svg></span><span>新建窗口</span><span class="popup-menu-shortcut">Ctrl+N</span></button>
+<button class="popup-menu-item" data-action="new-private-window"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></span><span>新建 InPrivate 窗口</span><span class="popup-menu-shortcut">Ctrl+Shift+N</span></button>
+<div class="popup-menu-divider"></div>
+<button class="popup-menu-item" data-action="zoom"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span><span>缩放</span><span class="popup-menu-shortcut" id="zoomLevelTxt">100%</span></button>
+<button class="popup-menu-item" data-action="bookmarks"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M17 3H7a2 2 0 00-2 2v16l7-3 7 3V5a2 2 0 00-2-2z"/></svg></span><span>收藏夹</span><span class="popup-menu-shortcut">Ctrl+Shift+O</span></button>
+<button class="popup-menu-item" data-action="history"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M13 3a9 9 0 00-9 9H1l3.9 3.9L8.6 13H6c0-3.9 3.1-7 7-7s7 3.1 7 7-3.1 7-7 7c-1.9 0-3.7-.8-5-2.1L6.6 19.3A8.96 8.96 0 0013 22a9 9 0 000-18z"/></svg></span><span>历史记录</span><span class="popup-menu-shortcut">Ctrl+H</span></button>
+<button class="popup-menu-item" data-action="downloads"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></span><span>下载</span><span class="popup-menu-shortcut">Ctrl+J</span></button>
+<button class="popup-menu-item" data-action="extensions"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.1 11.9 1 10.5 1S8 2.1 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5V22H17c1.1 0 2-.9 2-2v-4h1.5c1.4 0 2.5-1.1 2.5-2.5S21.9 11 20.5 11z"/></svg></span><span>扩展</span></button>
+<button class="popup-menu-item" data-action="passwords"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M18 8h-1V6c0-2.8-2.2-5-5-5S7 3.2 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.7 1.3-3 3-3s3 1.3 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg></span><span>密码</span></button>
+<button class="popup-menu-item" data-action="clear-data"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></span><span>删除浏览数据</span><span class="popup-menu-shortcut">Ctrl+Shift+Del</span></button>
+<button class="popup-menu-item" data-action="collections"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M22 16V4a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14a2 2 0 002 2h14v-2H4V6H2z"/></svg></span><span>集锦</span></button>
+<div class="popup-menu-divider"></div>
+<button class="popup-menu-item" data-action="print"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19 8H5c-1.7 0-3 1.3-3 3v6h4v4h12v-4h4v-6c0-1.7-1.3-3-3-3zm-3 11H8v-5h8v5zm3-7c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm-1-9H6v4h12V3z"/></svg></span><span>打印</span><span class="popup-menu-shortcut">Ctrl+P</span></button>
+<button class="popup-menu-item" data-action="translate"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 00-1.38-3.56A8.03 8.03 0 0118.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.987 7.987 0 015.08 16zm2.95-8H5.08a7.987 7.987 0 014.33-3.56A15.65 15.65 0 008.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg></span><span>翻译</span></button>
+<button class="popup-menu-item" data-action="split"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M3 3h8v18H3V3zm10 0h8v18h-8V3z"/></svg></span><span>分屏</span></button>
+<button class="popup-menu-item" data-action="screenshot"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M9 2L7.2 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2.2L15 2H9zm0 2h6l1.8 2H7.2L9 4zM12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/></svg></span><span>网页捕获</span></button>
+<button class="popup-menu-item" data-action="find"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></span><span>在页面上查找</span><span class="popup-menu-shortcut">Ctrl+F</span></button>
+<button class="popup-menu-item" data-action="readaloud"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0014 7.97v8.06A4.47 4.47 0 0016.5 12zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></span><span>大声朗读</span><span class="popup-menu-shortcut">Ctrl+Shift+U</span></button>
+<div class="popup-menu-divider"></div>
+<button class="popup-menu-item" data-action="customize"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67A2.5 2.5 0 0112 22zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5a.54.54 0 00-.14-.35c-.41-.46-.63-1.05-.63-1.65a2.5 2.5 0 012.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7z"/><circle cx="6.5" cy="11.5" r="1.5"/><circle cx="9.5" cy="7.5" r="1.5"/><circle cx="14.5" cy="7.5" r="1.5"/><circle cx="17.5" cy="11.5" r="1.5"/></svg></span><span>自定义 FL Browser</span></button>
+<button class="popup-menu-item" data-action="dev-tools"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg></span><span>开发人员工具</span><span class="popup-menu-shortcut">F12</span></button>
+<button class="popup-menu-item" data-action="settings"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1112 8.4a3.6 3.6 0 010 7.2z"/></svg></span><span>设置</span></button>
+<button class="popup-menu-item" data-action="help"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg></span><span>帮助和反馈</span></button>
+<div class="popup-menu-divider"></div>
+<button class="popup-menu-item" data-action="close-browser"><span class="popup-menu-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span><span>关闭 FL Browser</span></button>
+</div>
+
+<div class="reader-mode" id="readerMode">
+<div class="reader-header">
+<div class="reader-title">阅读模式</div>
+<div class="reader-controls">
+<button class="reader-btn" id="readerFontDown" title="缩小字体"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M6.5 10h11v2H6.5z"/></svg></button>
+<button class="reader-btn" id="readerFontUp" title="放大字体"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
+<button class="reader-btn" id="readerThemeToggle" title="切换背景"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg></button>
+<button class="reader-btn" id="readerClose" title="关闭"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+</div></div>
+<div class="reader-content" id="readerContent"></div>
+</div>
+
+<div class="find-bar hidden" id="findBar">
+<div class="find-input-wrapper">
+<input type="text" class="find-input" id="findInput" placeholder="在页面上查找...">
+</div>
+<span class="find-count" id="findCount">0/0</span>
+<div class="find-btns">
+<button class="find-btn" id="findPrevBtn"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon"><path d="M7 14l5-5 5 5H7z"/></svg></button>
+<button class="find-btn" id="findNextBtn"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon"><path d="M7 10l5 5 5-5H7z"/></svg></button>
+</div>
+<div class="find-options">
+<button class="find-option" id="findCase" title="区分大小写">Aa</button>
+<button class="find-option" id="findRegex" title="正则表达式">.*</button>
+<button class="find-option" id="findWhole" title="整词匹配">W</button>
+</div>
+<div class="find-close" id="findCloseBtn"><svg width="16" height="16" viewBox="0 0 24 24" class="svg-icon"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>
+</div>
+
+<div class="read-aloud-panel hidden" id="readAloudPanel">
+<button class="read-aloud-btn play" id="readAloudToggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+<button class="read-aloud-btn" id="readAloudPrev"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+<button class="read-aloud-btn" id="readAloudNext"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+<div class="read-aloud-separator"></div>
+<select class="read-aloud-select" id="readAloudVoice">
+<option value="auto">自动选择音色</option>
+</select>
+<div class="read-aloud-separator"></div>
+<div class="read-aloud-speed">
+<button class="read-aloud-btn" id="readAloudSpeedDown"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg></button>
+<input type="range" id="readAloudSpeedSlider" min="0.5" max="2" step="0.1" value="1">
+<span id="readAloudSpeedValue">1.0x</span>
+<button class="read-aloud-btn" id="readAloudSpeedUp"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v14l7-7z"/></svg></button>
+</div>
+<div class="read-aloud-separator"></div>
+<button class="read-aloud-btn" id="readAloudClose"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+</div>
+
+<div class="translate-panel" id="translatePanel">
+<div class="translate-header"><div class="translate-title">翻译</div><button class="translate-close" id="translateClose"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--text2)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div>
+<div class="translate-body">
+<div class="translate-lang-row">
+<select class="translate-lang-select" id="translateFrom">
+<option value="auto">自动检测</option>
+<option value="zh">中文</option>
+<option value="en">English</option>
+<option value="ja">日本語</option>
+<option value="ko">한국어</option>
+<option value="fr">Français</option>
+<option value="de">Deutsch</option>
+<option value="es">Español</option>
+<option value="ru">Русский</option>
+</select>
+<div class="translate-arrow" id="translateSwap"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg></div>
+<select class="translate-lang-select" id="translateTo">
+<option value="zh">中文</option>
+<option value="en">English</option>
+<option value="ja">日本語</option>
+<option value="ko">한국어</option>
+<option value="fr">Français</option>
+<option value="de">Deutsch</option>
+<option value="es">Español</option>
+<option value="ru">Русский</option>
+</select>
+</div>
+<div class="translate-input-row">
+<textarea class="translate-input" id="translateInput" placeholder="输入要翻译的文本..."></textarea>
+</div>
+<div class="translate-result" id="translateResult">翻译结果将显示在这里</div>
+<div class="translate-history">
+<div class="translate-history-title">翻译历史</div>
+<div class="translate-history-list" id="translateHistoryList"></div>
+</div>
+</div>
+<div class="translate-actions">
+<button class="translate-btn secondary" id="translateClear">清空</button>
+<button class="translate-btn primary" id="translateBtn">翻译</button>
+</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<div class="tab-preview" id="tabPreview"><div class="preview-title"></div><div class="preview-url"></div><div class="preview-img"></div></div>
+
+<script>
+(function(){
+var ELEC;try{ELEC=require('electron')}catch(e){ELEC=null}
+var ipc=ELEC?ELEC.ipcRenderer:null;
+function ipcSend(ch){if(ipc)try{ipc.send(ch)}catch(e){}}
+function G(id){return document.getElementById(id)}
+var tabs=[],activeTabId=null,readerFS=17,isBookmarked=false,zoomPct=100,isSpeaking=false;
+var findReqId=null,findMatches=0,findIdx=0,collections=[],bookmarks=[],historyItems=[],downloadsList=[];
+var savedPwd=JSON.parse((typeof localStorage!=='undefined'?localStorage.getItem('fl_pwd'):null)||'[]');
+var visitHistory=JSON.parse((typeof localStorage!=='undefined'?localStorage.getItem('fl_vhist'):null)||'[]');
+var settings={theme:'深色',se:'Google',startup:'newtab',startupUrl:'',smartscreen:true,adblock:false,askPwd:true,autoLogin:true,showBkmBar:false,showHomeBtn:true,trackingLevel:'balanced',efficiencyMode:false,verticalTabs:false,tabGroups:{}};
+
+function loadSettings(){try{var s=localStorage.getItem('fl_settings');if(s)Object.assign(settings,JSON.parse(s))}catch(e){}}
+function saveSettings(){try{localStorage.setItem('fl_settings',JSON.stringify(settings))}catch(e){}}
+loadSettings();
+
+function toast(msg,type){type=type||'info';var c=G('toastContainer');if(!c)return;var t=document.createElement('div');t.className='toast '+type;t.innerHTML='<span class="toast-msg">'+msg+'</span>';c.appendChild(t);requestAnimationFrame(function(){t.classList.add('show')});setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(t.parentNode)t.remove()},300)},2800)}
+
+function safeBind(id,evt,fn){var el=G(id);if(el){el.addEventListener(evt,fn);return true}return false}
+
+function getBtnId(el){
+while(el&&el!==document.body){
+if(el.id)return el.id;
+el=el.parentElement;
+}
+return null;
+}
+function initUI(){
+document.addEventListener('click',function(e){
+var target=e.target;
+var actionEl=target.closest('[data-action]');
+if(actionEl){
+if(actionEl.closest('#menuPopup')){
+e.stopPropagation();
+handleMenuAction(actionEl.getAttribute('data-action'));
+closeMenu();
+return;
+}
+}
+var btnId=getBtnId(target);
+if(!e.target.closest('#securityPanel')&&!e.target.closest('#btnSecurity')){var sp=G('securityPanel');if(sp)sp.classList.remove('show')}
+if(!e.target.closest('#menuPopup')&&!e.target.closest('#btnMenu'))closeMenu();
+if(!e.target.closest('#urlInput')&&!e.target.closest('#urlSuggestions'))hideSuggestions();
+if(!btnId)return;
+switch(btnId){
+case'btnMin':ipcSend('min');break
+case'btnMax':ipcSend('max');break
+case'btnClose':ipcSend('close');break
+case'btnBack':navBack();break
+case'btnForward':navForward();break
+case'btnRefresh':refreshTab();break
+case'btnHome':navigate('http://browser-home.windfl.dpdns.org/');break
+case'btnSecurity':toggleSecurityPanel();break
+case'btnBookmark':toggleBookmark();break
+case'btnReader':toggleReader();break
+case'btnCollections':showCollections();break
+case'btnVerticalTab':toggleVerticalTabs();break
+case'btnMenu':toggleMenu();break
+case'btnAddTab':createTab('newtab');break
+case'btnCloseVerticalTabs':toggleVerticalTabs();break
+case'tabActionsBtn':showTabActions();break
+case'readerClose':closeReader();break
+case'readerFontDown':adjustReaderFont(-1);break
+case'readerFontUp':adjustReaderFont(1);break
+case'readerThemeToggle':toggleReaderTheme();break
+case'findPrevBtn':findAction('prev');break
+case'findNextBtn':findAction('next');break
+case'findCloseBtn':closeFind();break
+case'findCase':toggleFindOption('caseSensitive');break
+case'findRegex':toggleFindOption('regex');break
+case'findWhole':toggleFindOption('wholeWord');break
+case'readAloudToggle':doReadAloud();break
+case'readAloudPrev':readAloudIndex=Math.max(0,readAloudIndex-500);if(isSpeaking){stopReadAloud();doReadAloud()}break
+case'readAloudNext':readAloudIndex=Math.min(readAloudText.length,readAloudIndex+500);if(isSpeaking){stopReadAloud();doReadAloud()}break
+case'readAloudSpeedDown':adjustReadAloudSpeed(-0.1);break
+case'readAloudSpeedUp':adjustReadAloudSpeed(0.1);break
+case'readAloudClose':stopReadAloud();break
+case'translateClose':hideTranslate();break
+case'translateSwap':swapLangs();break
+case'translateClear':clearTranslate();break
+case'translateBtn':doTranslate();break
+}
+});
+document.addEventListener('click',function(e){if(!e.target.closest('#translatePanel')&&!e.target.closest('[data-action="translate"]'))hideTranslate()});
+safeBind('readAloudVoice','change',function(){setReadAloudVoice(this.value)});
+safeBind('readAloudSpeedSlider','input',function(){setReadAloudSpeed(this.value)});
+safeBind('translateInput','keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doTranslate()}});
+safeBind('urlInput','keydown',function(e){if(e.key==='Enter'){var v=this.value.trim();if(v)navigate(v);hideSuggestions()}});
+safeBind('urlInput','input',function(){showSuggestions(this.value)});
+safeBind('urlInput','keydown',function(e){if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();navSuggestions(e.key)}});
+safeBind('findInput','keydown',function(e){if(e.key==='Enter')findAction('next');else if(e.key==='Escape')closeFind();else{clearTimeout(this._ft);var self=this;this._ft=setTimeout(function(){doFind(self.value)},150)}});
+document.addEventListener('keydown',handleKeyboard);
+if(ipc){ipc.on('fullscreen-changed',function(e,f){document.body.classList.toggle('fullscreen',!!f)});ipc.on('private-mode',function(e,p){if(p)document.body.classList.add('private')})}
+applyTheme(settings.theme);
+var vts=G('verticalTabsSidebar');if(vts){if(settings.verticalTabs)vts.classList.add('show');else vts.classList.remove('show')}
+var bkm=G('bookmarksBar');if(bkm){if(settings.showBkmBar)bkm.classList.remove('hidden');else bkm.classList.add('hidden')}
+updateBkmBar();
+updateZoomDisplay();
+var hb=G('btnHome');if(hb)hb.style.display=settings.showHomeBtn?'':'none';
+}
+
+function handleMenuAction(action){
+closeMenu();
+switch(action){
+case'newtab':createTab('newtab');break
+case'new-window':ipcSend('new-window');break
+case'new-private-window':ipcSend('new-private-window');break
+case'zoom':adjustZoom(10);break
+case'bookmarks':createTab('bookmarks');break
+case'history':createTab('history');break
+case'downloads':createTab('downloads');break
+case'extensions':createTab('extensions');break
+case'passwords':showPasswords();break
+case'clear-data':showClearData();break
+case'collections':showCollections();break
+case'print':doPrint();break
+case'translate':navigate('https://translate.google.com/');break
+case'split':toggleSplit();break
+case'screenshot':doScreenshot();break
+case'find':toggleFind();break
+case'readaloud':doReadAloud();break
+case'customize':showCustomize();break
+case'dev-tools':ipcSend('dev-tools');break
+case'settings':createTab('settings');break
+case'help':showHelp();break
+case'close-browser':ipcSend('close');break
+}
+}
+
+function handleKeyboard(e){
+var ctrl=e.ctrlKey||e.metaKey;
+if(e.key==='F11'){e.preventDefault();ipcSend('toggle-fullscreen');return}
+if(e.key==='F12'){e.preventDefault();ipcSend('dev-tools');return}
+if(ctrl&&e.key==='t'){e.preventDefault();createTab('newtab');return}
+if(ctrl&&e.key==='w'){e.preventDefault();closeCurrentTab();return}
+if(ctrl&&e.key==='f'){e.preventDefault();toggleFind();return}
+if(ctrl&&e.key==='h'){e.preventDefault();createTab('history');return}
+if(ctrl&&e.key==='j'){e.preventDefault();createTab('downloads');return}
+if(ctrl&&e.shiftKey&&e.key==='N'){e.preventDefault();ipcSend('new-private-window');return}
+if(ctrl&&e.shiftKey&&e.key==='Delete'){e.preventDefault();showClearData();return}
+if(ctrl&&e.shiftKey&&e.key==='O'){e.preventDefault();createTab('bookmarks');return}
+if(ctrl&&e.shiftKey&&e.key==='U'){e.preventDefault();doReadAloud();return}
+if(e.key==='Escape'){closeFind();closeReader()}
+}
+
+function init(){
+loadSettings();
+var startUrl='http://browser-home.windfl.dpdns.org/';
+if(settings.startup==='specific'&&settings.startupUrl)startUrl=settings.startupUrl;
+try{createTab('web',startUrl)}catch(e){console.error('createTab error:',e)}
+initUI();
+}
+
+function createTab(type,url){
+var id='t'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+var tabNames={newtab:'新标签页',settings:'设置',history:'历史记录',bookmarks:'书签',downloads:'下载',extensions:'扩展',siteinfo:'站点信息',collections:'集锦'};
+var title=tabNames[type]||(url?(url.length>45?url.slice(0,45)+'…':url):'新标签页');
+var groupId=settings.tabGroups&&activeTabId?settings.tabGroups[activeTabId]||null:null;
+tabs.push({id:id,title:title,type:type,url:url,group:groupId,sleeping:false,zoom:1,muted:false});
+renderTabs();switchTab(id);renderPage(id,type,url);
+if(type!=='web'){var u=G('urlInput');if(u)u.value='flb://'+type+'/'}
+updateVerticalTabs();
+}
+
+function switchTab(id){
+if(activeTabId&&settings.tabGroups&&settings.tabGroups[activeTabId]){
+settings.tabGroups[id]=settings.tabGroups[activeTabId]
+}
+activeTabId=id;renderTabs();
+var pages=document.querySelectorAll('.page');for(var i=0;i<pages.length;i++)pages[i].classList.remove('active');
+var pg=G('page_'+id);if(pg)pg.classList.add('active');
+var tab=tabs.find(function(t){return t.id===id});if(!tab)return;
+var u=G('urlInput');if(u){
+if(tab.type==='web')u.value=tab.url||'';
+else if(tab.type==='newtab'||tab.type==='page')u.value='';
+else u.value='flb://'+tab.type+'/'
+}
+updateNavButtons();updateVerticalTabs();updateBookmarkState();
+updateSecurityBadge(tab.type==='web'?tab.url:'');
+}
+
+function closeCurrentTab(){if(activeTabId)closeTab(activeTabId)}
+function closeTab(id){
+if(tabs.length<=1){toast('至少保留一个标签页','warning');return}
+var idx=tabs.findIndex(function(t){return t.id===id});
+tabs.splice(idx,1);var pg=G('page_'+id);if(pg)pg.remove();
+if(activeTabId===id){var nt=tabs[Math.min(idx,tabs.length-1)];if(nt)switchTab(nt.id)}
+renderTabs();updateVerticalTabs();
+}
+
+function renderTabs(){
+var c=G('tabsContainer');if(!c)return;
+c.innerHTML=tabs.map(function(t){
+var g=t.group?('style="background:'+t.group+'"'):'display:none';
+var sc=t.sleeping?' tab-sleeping':'';
+return'<div class="tab'+sc+' '+(t.id===activeTabId?'active':'')+'" data-tabid="'+t.id+'"><span class="tab-favicon">'+faviconChar(t)+'</span><span class="tab-title">'+escHtml(t.title)+'</span><span class="tab-close" data-close="'+t.id+'"><svg width="12" height="12" viewBox="0 0 24 24" class="svg-icon"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span><div class="tab-group-indicator" '+g+'></div></div>'
+}).join('');
+c.querySelectorAll('.tab').forEach(function(el){el.addEventListener('click',function(e){if(e.target.closest('[data-close]')){e.stopPropagation();closeTab(e.target.closest('[data-close]').dataset.close);return}switchTab(this.dataset.tabid)})});
+}
+
+function faviconChar(t){switch(t.type){case'settings':return'⚙';case'history':return'🕐';case'bookmarks':return'⭐';case'downloads':return'⬇';case'extensions':return'🧩';case'collections':return'📁';case'newtab':return'＋';default:return'🌐'}}
+
+function renderPage(id,type,url){
+var content=G('contentArea');if(!content)return;
+var old=G('page_'+id);if(old)old.remove();
+var page=document.createElement('div');page.id='page_'+id;page.className='page active';
+if(type==='newtab'){
+page.innerHTML=newtabHTML();
+var self=page;
+setTimeout(function(){self.querySelectorAll('.quick-link').forEach(function(el){el.addEventListener('click',function(){var u=this.dataset.url;if(u)navigate(u)})});var si=self.querySelector('.search-input');if(si)si.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=this.value.trim();if(v)navigate(v)}})},50)
+}else if(type==='settings'){page.innerHTML=settingsHTML();setTimeout(function(){bindSettingsEvents(page)},50)
+}else if(type==='history'){page.innerHTML=historyHTML()
+}else if(type==='bookmarks'){page.innerHTML=bookmarksHTML()
+}else if(type==='downloads'){page.innerHTML=downloadsHTML()
+}else if(type==='extensions'){page.innerHTML=extensionsHTML();setTimeout(function(){bindExtensionsEvents(page)},50)
+}else if(type==='collections'){page.innerHTML=collectionsHTML()
+}else if(type==='siteinfo'){page.innerHTML=siteinfoHTML(url)
+}else{
+var wv=document.createElement('webview');wv.id='wv_'+id;wv.style.width='100%';wv.style.height='100%';
+wv.addEventListener('did-start-loading',function(){updateProgress(30)});
+wv.addEventListener('did-stop-loading',function(){updateProgress(100);updateNavButtons();updateBookmarkState()});
+wv.addEventListener('did-navigate',function(e){tabUpdate(id,e.url);updateProgress(100);updateNavButtons();updateBookmarkState();updateSecurityBadge(e.url)});
+wv.addEventListener('did-navigate-in-page',function(e){if(e.isMainFrame){tabUpdate(id,e.url);updateSecurityBadge(e.url)}});
+wv.addEventListener('page-title-updated',function(e){var t=tabs.find(function(x){return x.id===id});if(t){t.title=e.title;renderTabs();updateVerticalTabs()}});
+wv.addEventListener('did-finish-load',function(){updateProgress(0);updateNavButtons()});
+wv.addEventListener('found-in-page',function(e){findMatches=e.result.matches;findIdx=e.result.activeMatchOrdinal;var fc=G('findCount');if(fc)fc.textContent=findIdx+'/'+findMatches;findReqId=e.result.requestId});
+wv.addEventListener('new-window',function(e){e.preventDefault();createTab('web',e.url)});
+wv.addEventListener('page-favicon-updated',function(e){var t=tabs.find(function(x){return x.id===id});if(t&&e.favicons&&e.favicons.length){t.favicon=e.favicons[0];renderTabs()}});
+page.appendChild(wv);
+try{wv.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0')}catch(e){}
+wv.src=url;updateProgress(10)
+}
+content.appendChild(page)
+}
+
+function tabUpdate(id,url){var t=tabs.find(function(x){return x.id===id});if(t){t.title=url;t.url=url;t.type='web'}renderTabs();updateVerticalTabs();if(id===activeTabId){var u=G('urlInput');if(u)u.value=url}}
+
+function updateNavButtons(){
+var w=getWebview(activeTabId);var b=G('btnBack');var f=G('btnForward');
+if(!w||!b||!f){if(b)b.disabled=true;if(f)f.disabled=true;return}
+try{b.disabled=!w.canGoBack();f.disabled=!w.canGoForward()}catch(e){}
+}
+
+function navBack(){var w=getWebview(activeTabId);if(!w||!w.canGoBack())return;w.goBack()}
+function navForward(){var w=getWebview(activeTabId);if(!w||!w.canGoForward())return;w.goForward()}
+function refreshTab(){var w=getWebview(activeTabId);if(w)w.reload()}
+
+function navigate(input){
+if(!activeTabId)return;var url=input.trim();if(!url)return;
+if(url.startsWith('flb://')){createTab(url.replace('flb://','').split('/')[0]);return}
+if(!url.includes('://')){
+if(url.includes('.')&&!url.includes(' ')){url='https://'+url}else{var qs={'Google':'https://www.google.com/search?q=','百度':'https://www.baidu.com/s?wd=','Bing':'https://www.bing.com/search?q=','DuckDuckGo':'https://duckduckgo.com/?q='};url=(qs[settings.se]||qs['Google'])+encodeURIComponent(url)}
+}
+addToHistory(url);
+var tab=tabs.find(function(t){return t.id===activeTabId});if(!tab)return;
+tab.type='web';tab.url=url;tab.title=url;renderTabs();updateVerticalTabs();
+var pg=G('page_'+activeTabId);if(!pg)return;pg.innerHTML='';
+var wv=document.createElement('webview');wv.id='wv_'+activeTabId;wv.style.width='100%';wv.style.height='100%';
+wv.addEventListener('did-start-loading',function(){updateProgress(30)});
+wv.addEventListener('did-stop-loading',function(){updateProgress(100);updateNavButtons();updateBookmarkState()});
+wv.addEventListener('did-navigate',function(e){tabUpdate(activeTabId,e.url);updateProgress(100);updateNavButtons();updateBookmarkState();updateSecurityBadge(e.url)});
+wv.addEventListener('did-navigate-in-page',function(e){if(e.isMainFrame){tabUpdate(activeTabId,e.url);updateSecurityBadge(e.url)}});
+wv.addEventListener('page-title-updated',function(e){var t=tabs.find(function(x){return x.id===activeTabId});if(t){t.title=e.title;renderTabs();updateVerticalTabs()}});
+wv.addEventListener('did-finish-load',function(){updateProgress(0);updateNavButtons()});
+wv.addEventListener('found-in-page',function(e){findMatches=e.result.matches;findIdx=e.result.activeMatchOrdinal;var fc=G('findCount');if(fc)fc.textContent=findIdx+'/'+findMatches;findReqId=e.result.requestId});
+wv.addEventListener('new-window',function(e){e.preventDefault();createTab('web',e.url)});
+wv.addEventListener('page-favicon-updated',function(e){var t=tabs.find(function(x){return x.id===activeTabId});if(t&&e.favicons&&e.favicons.length){t.favicon=e.favicons[0];renderTabs()}});
+pg.appendChild(wv);
+try{wv.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0')}catch(e){}
+wv.src=url;updateProgress(10);var ui=G('urlInput');if(ui)ui.value=url;
+}
+
+function updateProgress(pct){
+var bar=G('progressBar');if(!bar)return;
+if(pct>=100){bar.classList.add('done');setTimeout(function(){bar.classList.remove('done');bar.style.width='0'},600);return}
+bar.classList.remove('done');bar.style.width=Math.min(pct,90)+'%'
+}
+
+function toggleBookmark(){
+isBookmarked=!isBookmarked;var icon=G('bkmSvg');
+if(icon){if(isBookmarked){icon.style.fill='#f9e2af';icon.style.stroke='#f9e2af'}else{icon.style.fill='';icon.style.stroke=''}}
+if(isBookmarked){
+var tab=tabs.find(function(t){return t.id===activeTabId});var url=tab?tab.url:'';
+var existing=bookmarks.find(function(b){return b.url===url});
+if(!existing&&url){bookmarks.push({title:tab?tab.title:'',url:url,date:Date.now()});toast('已添加到收藏夹','success')}
+}
+updateBkmBar()
+}
+
+function updateBookmarkState(){
+var tab=tabs.find(function(t){return t.id===activeTabId});if(!tab||tab.type!=='web')return;
+isBookmarked=bookmarks.some(function(b){return b.url===tab.url});
+var icon=G('bkmSvg');
+if(icon){if(isBookmarked){icon.style.fill='#f9e2af';icon.style.stroke='#f9e2af'}else{icon.style.fill='';icon.style.stroke=''}}
+}
+
+function toggleSecurityPanel(){
+var panel=G('securityPanel');if(!panel)return;
+var tab=tabs.find(function(t){return t.id===activeTabId});
+var url=tab?(tab.url||''):'';var domain='';try{domain=new URL(url).hostname}catch(e){domain=url}
+var isSecure=url.startsWith('https://');
+panel.innerHTML='<div class="security-panel-header"><div class="security-panel-icon '+(isSecure?'secure':'insecure')+'"><svg width="28" height="28" viewBox="0 0 24 24" fill="'+(isSecure?'var(--green)':'var(--red)')+'"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div><div class="security-panel-title">'+(isSecure?'连接是安全的':'连接不安全')+'</div><div class="security-panel-domain">'+escHtml(domain||'新标签页')+'</div></div><div class="security-panel-section"><div class="security-panel-section-title">此站点的权限</div><div class="security-panel-row"><span>位置信息</span><span class="security-panel-status blocked">已阻止</span></div><div class="security-panel-row"><span>摄像头</span><span class="security-panel-status blocked">已阻止</span></div><div class="security-panel-row"><span>麦克风</span><span class="security-panel-status blocked">已阻止</span></div><div class="security-panel-row"><span>通知</span><span class="security-panel-status blocked">已阻止</span></div></div><div class="security-panel-section"><div class="security-panel-section-title">跟踪防护</div><div class="security-panel-row"><span>级别</span><span class="security-panel-status allowed">'+({'basic':'基本','balanced':'均衡','strict':'严格'})[settings.trackingLevel]+'</span></div></div><button class="security-panel-btn" onclick="window._flShowSiteInfo()">查看站点权限详情</button>';
+panel.classList.toggle('show')
+}
+window._flShowSiteInfo=function(){var sp=G('securityPanel');if(sp)sp.classList.remove('show');var tab=tabs.find(function(t){return t.id===activeTabId});createTab('siteinfo',tab?tab.url:'')};
+
+function updateSecurityBadge(url){
+var btn=G('secSvg');if(!btn)return;
+var isSecure=url&&url.startsWith('https://');
+if(isSecure){btn.style.fill='var(--green)';btn.style.stroke='var(--green)'}else{btn.style.fill='';btn.style.stroke=''}
+}
+
+function toggleMenu(){var m=G('menuPopup');if(!m)return;m.classList.toggle('show');if(m.classList.contains('show'))updateZoomDisplay()}
+function closeMenu(){var m=G('menuPopup');if(m)m.classList.remove('show')}
+
+var findOptions={caseSensitive:false,regex:false,wholeWord:false};
+function toggleFind(){var f=G('findBar');if(!f)return;f.classList.toggle('hidden');if(!f.classList.contains('hidden')){var fi=G('findInput');if(fi){fi.focus();fi.value=''}var fc=G('findCount');if(fc)fc.textContent='0/0';findOptions={caseSensitive:false,regex:false,wholeWord:false};updateFindOptions()}}
+function closeFind(){var f=G('findBar');if(f)f.classList.add('hidden');findReqId=null;var w=getWebview(activeTabId);if(w)w.stopFindInPage('clearSelection')}
+function updateFindOptions(){var fc=G('findCase');var fr=G('findRegex');var fw=G('findWhole');if(fc)fc.classList.toggle('active',findOptions.caseSensitive);if(fr)fr.classList.toggle('active',findOptions.regex);if(fw)fw.classList.toggle('active',findOptions.wholeWord)}
+function toggleFindOption(opt){findOptions[opt]=!findOptions[opt];updateFindOptions();doFind(G('findInput').value)}
+function doFind(text){var fc=G('findCount');if(!text){var w=getWebview(activeTabId);if(w)w.stopFindInPage('clearSelection');if(fc)fc.textContent='0/0';return}var w=getWebview(activeTabId);if(w){var opts={matchCase:findOptions.caseSensitive,wordStart:findOptions.wholeWord,wordEnd:findOptions.wholeWord};if(findOptions.regex){try{new RegExp(text);opts.forward=true}catch(e){toast('无效的正则表达式','warning');return}}findReqId=w.findInPage(text,opts)}}
+function findAction(dir){var w=getWebview(activeTabId);var fi=G('findInput');if(w&&fi){var opts={forward:dir==='next',findNext:true,matchCase:findOptions.caseSensitive};w.findInPage(fi.value||'',opts)}}
+
+function toggleReader(){
+var reader=G('readerMode');if(!reader)return;
+if(reader.classList.contains('show')){reader.classList.remove('show');return}
+var wv=getWebview(activeTabId);var rc=G('readerContent');if(!rc)return;
+if(wv){wv.executeJavaScript('(function(){var h=document.querySelector("h1,.article-title,.post-title");var t=h?h.innerText.trim():document.title;var ps=document.querySelectorAll("article p,main p,.content p,.post-content p,section p,.article-body p");if(ps.length===0)ps=document.querySelectorAll("p");var txt="";for(var i=0;i<Math.min(ps.length,60);i++){var tx=ps[i].innerText.trim();if(tx.length>15)txt+="<p>"+tx.replace(/</g,"&lt;").replace(/>/g,"&gt;")+"</p>"}return JSON.stringify({title:t.replace(/</g,"&lt;"),content:txt||"<p>未能提取到足够内容</p>"})})()').then(function(r){try{var d=JSON.parse(r);rc.innerHTML='<h1>'+d.title+'</h1>'+d.content}catch(e){rc.innerHTML='<h1>阅读模式</h1><p>无法提取网页内容，请确认页面已加载完成</p>'}}).catch(function(){rc.innerHTML='<h1>阅读模式</h1><p>请先打开一个网页再使用阅读模式</p>'})}
+else{rc.innerHTML='<h1>阅读模式</h1><p>请先打开一个网页再使用阅读模式</p>'}
+readerFS=17;rc.style.fontSize='17px';reader.classList.add('show')
+}
+function closeReader(){var r=G('readerMode');if(r)r.classList.remove('show');if(isSpeaking){window.speechSynthesis.cancel();isSpeaking=false}}
+function adjustReaderFont(d){var c=G('readerContent');if(!c)return;readerFS=Math.max(12,Math.min(26,readerFS+d));c.style.fontSize=readerFS+'px'}
+var readerThemeIdx=0;var readerThemes=['var(--bg)','#f5f5dc','#1a1a2e'];var readerTexts=['var(--text)','#333','#e8eaed'];
+function toggleReaderTheme(){readerThemeIdx=(readerThemeIdx+1)%3;var rm=G('readerMode');if(rm)rm.style.background=readerThemes[readerThemeIdx];var rc=G('readerContent');if(rc)rc.style.color=readerTexts[readerThemeIdx]}
+
+function adjustZoom(d){zoomPct=Math.max(25,Math.min(500,zoomPct+d));var w=getWebview(activeTabId);if(w)try{w.setZoomFactor(zoomPct/100)}catch(e){}updateZoomDisplay()}
+function updateZoomDisplay(){var el=G('zoomLevelTxt');if(el)el.textContent=zoomPct+'%'}
+function setZoom(v){zoomPct=v;var w=getWebview(activeTabId);if(w)try{w.setZoomFactor(v/100)}catch(e){}updateZoomDisplay()}
+
+function toggleSplit(){
+var w=getWebview(activeTabId);if(!w){toast('请先打开一个网页','warning');return}
+toast('分屏：在地址栏输入第二个网址','info')
+}
+
+function doScreenshot(){
+var w=getWebview(activeTabId);if(!w){for(var i=0;i<tabs.length;i++){var wv=getWebview(tabs[i].id);if(wv){w=wv;break}}}
+if(!w){toast('请先打开一个网页再进行网页捕获','warning');return}
+try{w.capturePage().then(function(img){var a=document.createElement('a');a.href=img.toDataURL();a.download='FL_截图_'+Date.now()+'.png';a.click();toast('网页捕获已保存','success')}).catch(function(){toast('网页捕获失败，请重试','warning')})}catch(e){toast('网页捕获失败','warning')}
+}
+
+function doPrint(){var w=getWebview(activeTabId);if(!w){toast('请先打开一个网页','warning');return}try{w.print()}catch(e){ipcSend('print')}}
+
+var readAloudVoices=[];var readAloudCurrentVoice=null;var readAloudRate=1;var readAloudText='';var readAloudIndex=0;
+var translateHistory=JSON.parse((typeof localStorage!=='undefined'?localStorage.getItem('fl_translate'):null)||'[]');
+function loadVoices(){readAloudVoices=window.speechSynthesis.getVoices();var sel=G('readAloudVoice');if(sel){sel.innerHTML='<option value="auto">自动选择音色</option>'+readAloudVoices.filter(function(v){return v.lang.startsWith('zh')||v.lang.startsWith('en')}).map(function(v,i){return'<option value="'+i+'">'+v.name+' ('+v.lang+')</option>'}).join('')}}
+if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=loadVoices;loadVoices()}
+function showReadAloudPanel(){var p=G('readAloudPanel');if(p)p.classList.remove('hidden');}
+function hideReadAloudPanel(){var p=G('readAloudPanel');if(p)p.classList.add('hidden');}
+function doReadAloud(){
+if(!window.speechSynthesis){toast('您的设备不支持语音合成','warning');return}
+showReadAloudPanel();
+if(isSpeaking){toggleReadAloudPause();return}
+var w=getWebview(activeTabId);
+if(!w){readAloudText='请先打开一个网页再进行朗读';startReadAloud();return}
+w.executeJavaScript('document.body?document.body.innerText:""').then(function(t){readAloudText=(t||'当前页面无可朗读的文字内容').slice(0,10000);readAloudIndex=0;startReadAloud();}).catch(function(){readAloudText='无法获取页面内容进行朗读';startReadAloud()})
+}
+function startReadAloud(){
+isSpeaking=true;updateReadAloudUI();
+var utterance=new SpeechSynthesisUtterance(readAloudText.slice(readAloudIndex,readAloudIndex+500));
+utterance.lang='zh-CN';utterance.rate=readAloudRate;
+if(readAloudCurrentVoice!==null&&readAloudVoices[readAloudCurrentVoice]){utterance.voice=readAloudVoices[readAloudCurrentVoice]}
+utterance.onend=function(){readAloudIndex+=500;if(readAloudIndex<readAloudText.length){startReadAloud()}else{isSpeaking=false;toast('朗读完成','success');updateReadAloudUI();hideReadAloudPanel()}};
+utterance.onerror=function(){isSpeaking=false;toast('朗读出错','warning');updateReadAloudUI();hideReadAloudPanel()};
+window.speechSynthesis.speak(utterance);
+toast('正在朗读...','info')
+}
+function toggleReadAloudPause(){
+if(isSpeaking){window.speechSynthesis.pause();isSpeaking=false;toast('朗读已暂停','info')}else{window.speechSynthesis.resume();isSpeaking=true;toast('继续朗读','info')}
+updateReadAloudUI()
+}
+function stopReadAloud(){
+window.speechSynthesis.cancel();isSpeaking=false;readAloudText='';readAloudIndex=0;updateReadAloudUI();hideReadAloudPanel();toast('已停止朗读','info')
+}
+function updateReadAloudUI(){
+var toggle=G('readAloudToggle');var panel=G('readAloudPanel');
+if(toggle){toggle.innerHTML=isSpeaking?'<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>':'<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>'}
+if(panel&&!isSpeaking&&!readAloudText)panel.classList.add('hidden')
+}
+function setReadAloudVoice(idx){readAloudCurrentVoice=idx==='auto'?null:parseInt(idx);if(isSpeaking){stopReadAloud();doReadAloud()}}
+function setReadAloudSpeed(val){readAloudRate=parseFloat(val);var el=G('readAloudSpeedValue');if(el)el.textContent=val+'x';if(isSpeaking){stopReadAloud();doReadAloud()}}
+function adjustReadAloudSpeed(d){var newSpeed=Math.max(0.5,Math.min(2,readAloudRate+d));setReadAloudSpeed(newSpeed);var slider=G('readAloudSpeedSlider');if(slider)slider.value=newSpeed}
+
+function showTranslate(){var p=G('translatePanel');if(p){p.classList.add('show');updateTranslateHistory()}var ti=G('translateInput');if(ti)ti.focus()}
+function hideTranslate(){var p=G('translatePanel');if(p)p.classList.remove('show')}
+function swapLangs(){var from=G('translateFrom');var to=G('translateTo');var tmp=from.value;from.value=to.value;to.value=tmp}
+function clearTranslate(){G('translateInput').value='';G('translateResult').textContent='翻译结果将显示在这里'}
+function doTranslate(){var text=G('translateInput').value.trim();var from=G('translateFrom').value;var to=G('translateTo').value;if(!text){toast('请输入要翻译的文本','warning');return}var result=G('translateResult');result.textContent='正在翻译...';mockTranslate(text,from,to).then(function(res){result.textContent=res;addToTranslateHistory(text,res,from,to);updateTranslateHistory();toast('翻译完成','success')}).catch(function(){result.textContent='翻译失败，请检查网络连接';toast('翻译失败','warning')})}
+function mockTranslate(text,from,to){return new Promise(function(resolve){setTimeout(function(){var translations={en:{zh:'这是一个测试翻译',en:'This is a test translation',ja:'これはテスト翻訳です',ko:'이것은 테스트 번역입니다',fr:"Ceci est une traduction de test",de:"Dies ist eine Testübersetzung",es:"Esta es una traducción de prueba",ru:"Это тестовый перевод"},zh:{en:'This is a test translation',zh:'这是测试文本',ja:'これはテストテキストです',ko:'이것은 테스트 텍스트입니다',fr:"Ceci est un texte de test",de:"Dies ist ein Testtext",es:"Este es un texto de prueba",ru:"Это тестовый текст"},ja:{zh:'这是日语测试文本',en:'This is Japanese test text',ja:'これは日本語のテストテキストです',ko:'이것은 일본어 테스트 텍스트입니다',fr:"Ceci est un texte de test japonais",de:"Dies ist ein japanischer Testtext",es:"Este es un texto de prueba japonés",ru:"Это японский тестовый текст"},ko:{zh:'这是韩语测试文本',en:'This is Korean test text',ja:'これは韓国語のテストテキストです',ko:'이것은 한국어 테스트 텍스트입니다',fr:"Ceci est un texte de test coréen",de:"Dies ist ein koreanischer Testtext",es:"Este es un texto de prueba coreano",ru:"Это корейский тестовый текст"},fr:{zh:'这是法语测试文本',en:'This is French test text',ja:'これはフランス語のテストテキストです',ko:'이것은 프랑스어 테스트 텍스트입니다',fr:"Ceci est un texte de test français",de:"Dies ist ein französischer Testtext",es:"Este es un texto de prueba francés",ru:"Это французский тестовый текст"},de:{zh:'这是德语测试文本',en:'This is German test text',ja:'これはドイツ語のテストテキストです',ko:'이것은 독일어 테스트 텍스트입니다',fr:"Ceci est un texte de test allemand",de:"Dies ist ein deutscher Testtext",es:"Este es un texto de prueba alemán",ru:"Это немецкий тестовый текст"},es:{zh:'这是西班牙语测试文本',en:'This is Spanish test text',ja:'これはスペイン語のテストテキストです',ko:'이것은 스페인어 테스트 텍스트입니다',fr:"Ceci est un texte de test espagnol",de:"Dies ist ein spanischer Testtext",es:"Este es un texto de prueba español",ru:"Это испанский тестовый текст"},ru:{zh:'这是俄语测试文本',en:'This is Russian test text',ja:'これはロシア語のテストテキストです',ko:'이것은 러시아어 테스트 텍스트입니다',fr:"Ceci est un texte de test russe",de:"Dies ist ein russischer Testtext",es:"Este es un texto de prueba ruso",ru:"Это русский тестовый текст"}};var detected=detectLang(text);var src=from==='auto'?detected:from;resolve(translations[src]&&translations[src][to]||'翻译结果: '+text)},500+Math.random()*500)})}
+function detectLang(text){var chinese=/[\u4e00-\u9fa5]/;var japanese=/[\u3040-\u30ff\u3400-\u4dbf]/;var korean=/[\uac00-\ud7af]/;if(chinese.test(text))return'zh';if(japanese.test(text))return'ja';if(korean.test(text))return'ko';return'en'}
+function addToTranslateHistory(input,result,from,to){translateHistory.unshift({input:input,result:result,from:from,to:to,date:Date.now()});if(translateHistory.length>50)translateHistory=translateHistory.slice(0,50);try{localStorage.setItem('fl_translate',JSON.stringify(translateHistory))}catch(e){}}
+function updateTranslateHistory(){var list=G('translateHistoryList');if(!list)return;if(translateHistory.length===0){list.innerHTML='<div style="color:var(--text3);text-align:center;padding:12px">暂无翻译历史</div>';return}list.innerHTML=translateHistory.slice(0,10).map(function(t,i){return'<div class="translate-history-item" data-index="'+i+'"><span class="translate-history-text">'+escHtml(t.input)+'</span><span class="translate-history-lang">'+t.from+' → '+t.to+'</span><span class="translate-history-delete" data-index="'+i+'">✕</span></div>'}).join('');list.querySelectorAll('.translate-history-item').forEach(function(el){el.addEventListener('click',function(e){if(e.target.classList.contains('translate-history-delete')){var idx=parseInt(e.target.dataset.index);translateHistory.splice(idx,1);localStorage.setItem('fl_translate',JSON.stringify(translateHistory));updateTranslateHistory();return}var idx=parseInt(el.dataset.index);var item=translateHistory[idx];G('translateInput').value=item.input;G('translateFrom').value=item.from;G('translateTo').value=item.to;doTranslate()})})}
+
+function showPasswords(){
+savedPwd=JSON.parse(localStorage.getItem('fl_pwd')||'[]');
+var page=G('page_'+activeTabId);if(!page)return;
+var list=savedPwd.length===0?'<div style="color:var(--text3);text-align:center;padding:32px">暂无保存的密码</div>':savedPwd.map(function(p,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text)">'+escHtml(p.site)+'</div><div style="font-size:11px;color:var(--text3)">'+escHtml(p.username)+'</div></div><div style="display:flex;gap:6px"><button class="btn-secondary" style="padding:4px 10px;font-size:12px" onclick="window._flCopyPwd('+i+')">复制</button><button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="window._flDelPwd('+i+')">删除</button></div></div>'}).join('');
+page.innerHTML='<div style="padding:24px"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--text)" style="display:inline;vertical-align:middle;margin-right:8px"><path d="M18 8h-1V6c0-2.8-2.2-5-5-5S7 3.2 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.7 1.3-3 3-3s3 1.3 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>密码管理</h2><div style="background:var(--bg3);border-radius:12px;padding:18px;margin-bottom:16px">'+list+'<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn-primary" onclick="window._flAddPwd()">添加密码</button><button class="btn-secondary" onclick="window._flExportPwd()">导出</button><button class="btn-secondary" onclick="window._flImportPwd()">导入</button></div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;color:var(--text);font-size:13px;border-top:1px solid var(--border);margin-top:14px"><span>询问是否保存密码</span><div class="toggle-switch on" onclick="window._flTogglePwdAsk(this)"></div></div><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;color:var(--text);font-size:13px"><span>自动登录</span><div class="toggle-switch on" onclick="window._flToggleAutoLogin(this)"></div></div></div></div>';
+var tab=tabs.find(function(t){return t.id===activeTabId});if(tab){tab.type='page';tab.title='密码';renderTabs()}
+}
+window._flCopyPwd=function(i){if(savedPwd[i]&&navigator.clipboard)navigator.clipboard.writeText(savedPwd[i].password);toast('密码已复制到剪贴板','success')};
+window._flDelPwd=function(i){savedPwd.splice(i,1);localStorage.setItem('fl_pwd',JSON.stringify(savedPwd));toast('密码已删除','success');showPasswords()};
+window._flAddPwd=function(){showAddPwdDialog()};
+window._flExportPwd=function(){var blob=new Blob([JSON.stringify(savedPwd,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='FL_Browser_密码_'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('密码已导出','success')};
+window._flImportPwd=function(){var inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=function(){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(Array.isArray(d)){savedPwd=d;localStorage.setItem('fl_pwd',JSON.stringify(savedPwd));toast('密码已导入('+d.length+'条)','success');showPasswords()}else{toast('无效的密码文件格式','warning')}}catch(e){toast('导入失败：文件格式不正确','warning')}};r.readAsText(f)};inp.click()};
+window._flTogglePwdAsk=function(el){el.classList.toggle('on')};
+window._flToggleAutoLogin=function(el){el.classList.toggle('on')};
+
+function showAddPwdDialog(){
+var ov=document.createElement('div');ov.className='overlay';
+ov.innerHTML='<div class="dialog"><h2>添加密码</h2><div style="margin-bottom:12px"><label style="font-size:12px;color:var(--text3)">网站</label><input id="ap_site" placeholder="例如: example.com"></div><div style="margin-bottom:12px"><label style="font-size:12px;color:var(--text3)">用户名</label><input id="ap_user" placeholder="用户名"></div><div style="margin-bottom:12px"><label style="font-size:12px;color:var(--text3)">密码</label><input id="ap_pwd" type="password" placeholder="密码"></div><div class="dialog-actions"><button class="btn-secondary" onclick="this.closest(\'.overlay\').remove()">取消</button><button class="btn-primary" id="apSave">保存</button></div></div>';
+document.body.appendChild(ov);
+ov.addEventListener('click',function(e){if(e.target===ov)ov.remove()});
+var saveBtn=document.getElementById('apSave');if(saveBtn)saveBtn.addEventListener('click',function(){
+var s=document.getElementById('ap_site').value.trim();var u=document.getElementById('ap_user').value.trim();var p=document.getElementById('ap_pwd').value;
+if(!s||!u||!p){toast('请填写完整信息','warning');return}
+savedPwd.push({site:s,username:u,password:p,date:Date.now()});
+localStorage.setItem('fl_pwd',JSON.stringify(savedPwd));toast('密码已添加','success');ov.remove();showPasswords()
+})
+}
+
+function showClearData(){
+var ov=document.createElement('div');ov.className='overlay';
+ov.innerHTML='<div class="dialog"><h2>删除浏览数据</h2><div style="margin-bottom:14px"><label style="font-size:12px;color:var(--text3);margin-bottom:4px;display:block">时间范围</label><select id="clRange"><option value="lasthour">过去一小时</option><option value="lastday">过去24小时</option><option value="lastweek">过去7天</option><option value="lastmonth">过去4周</option><option value="all">所有时间</option></select></div><div style="background:var(--bg);border-radius:8px;padding:14px"><label style="display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" checked> 浏览历史</label><label style="display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" checked> Cookie 和其他网站数据</label><label style="display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" checked> 缓存的图片和文件</label><label style="display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" id="clPwdChk"> 密码</label><label style="display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox"> 表单自动填充数据</label></div><div class="dialog-actions"><button class="btn-secondary" onclick="this.closest(\'.overlay\').remove()">取消</button><button class="btn-primary" id="clClearBtn">清除数据</button></div></div>';
+document.body.appendChild(ov);
+ov.addEventListener('click',function(e){if(e.target===ov)ov.remove()});
+var clrBtn=document.getElementById('clClearBtn');if(clrBtn)clrBtn.addEventListener('click',function(){
+if(document.getElementById('clPwdChk')&&document.getElementById('clPwdChk').checked){savedPwd=[];localStorage.setItem('fl_pwd','[]')}
+var range=document.getElementById('clRange').value||'all';
+var labels={'lasthour':'过去一小时','lastday':'过去24小时','lastweek':'过去7天','lastmonth':'过去4周','all':'所有时间'};
+historyItems=[];toast('已清除 '+labels[range]+' 的浏览数据','success');ov.remove()
+})
+}
+
+function showCollections(){
+var page=G('page_'+activeTabId);if(!page)return;
+var list=collections.length===0?'<div style="color:var(--text3);text-align:center;padding:32px"><svg width="48" height="48" viewBox="0 0 24 24" fill="var(--text3)" style="margin-bottom:12px"><path d="M22 16V4a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14a2 2 0 002 2h14v-2H4V6H2z"/></svg><br><span style="font-size:12px">从菜单或右键菜单将网页添加到集锦</span></div>':collections.map(function(c,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text)">'+escHtml(c.title)+'</div><div style="font-size:11px;color:var(--text3)">'+escHtml(c.url)+'</div></div><button class="btn-secondary" style="padding:4px 10px;font-size:12px" onclick="window._flOpenCol('+i+')">打开</button></div>'}).join('');
+page.innerHTML='<div style="padding:24px"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500"><svg width="20" height="20" viewBox="0 0 24 24" fill="var(--text)" style="display:inline;vertical-align:middle;margin-right:8px"><path d="M22 16V4a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2zm-11-4l2.03 2.71L16 11l4 5H8l3-4zM2 6v14a2 2 0 002 2h14v-2H4V6H2z"/></svg>集锦</h2><div style="background:var(--bg3);border-radius:12px;padding:18px;margin-bottom:16px">'+list+'<div style="display:flex;gap:8px;margin-top:14px"><button class="btn-primary" onclick="window._flAddCol()">添加当前页面</button><button class="btn-secondary" onclick="window._flClearCol()">清空集锦</button></div></div></div>';
+var tab=tabs.find(function(t){return t.id===activeTabId});if(tab){tab.type='page';tab.title='集锦';renderTabs()}
+}
+window._flOpenCol=function(i){if(collections[i])navigate(collections[i].url)};
+window._flAddCol=function(){var tab=tabs.find(function(t){return t.id===activeTabId});if(tab&&tab.url){collections.push({title:tab.title,url:tab.url,date:Date.now()});toast('已添加到集锦','success');showCollections()}else{toast('当前页面无法添加到集锦','warning')}};
+window._flClearCol=function(){collections=[];toast('集锦已清空','info');showCollections()};
+
+function showCustomize(){
+var ov=document.createElement('div');ov.className='overlay';
+ov.innerHTML='<div class="dialog" style="min-width:460px"><h2>自定义 FL Browser</h2><div style="margin-bottom:18px"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">主题</div><div class="theme-options"><div class="theme-option'+(settings.theme==='浅色'?' active':'')+'" data-theme="浅色"><div class="theme-preview" style="background:linear-gradient(135deg,#4285f4,#34a853)"></div><span>浅色</span></div><div class="theme-option'+(settings.theme==='深色'?' active':'')+'" data-theme="深色"><div class="theme-preview" style="background:linear-gradient(135deg,#1e1e2e,#252536)"></div><span>深色</span></div></div></div><div style="margin-bottom:18px"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">显示</div><label style="display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" id="custBkmBar" '+(settings.showBkmBar?'checked':'')+'> 显示收藏夹栏</label><label style="display:flex;align-items:center;gap:8px;padding:7px 0;font-size:13px;color:var(--text);cursor:pointer"><input type="checkbox" id="custHomeBtn" '+(settings.showHomeBtn?'checked':'')+'> 显示主页按钮</label></div><div class="dialog-actions"><button class="btn-secondary" onclick="this.closest(\'.overlay\').remove()">取消</button><button class="btn-primary" id="custSave">完成</button></div></div>';
+document.body.appendChild(ov);
+ov.addEventListener('click',function(e){if(e.target===ov)ov.remove()});
+ov.querySelectorAll('.theme-option').forEach(function(el){el.addEventListener('click',function(){settings.theme=this.dataset.theme;applyTheme(settings.theme);saveSettings();ov.querySelectorAll('.theme-option').forEach(function(e){e.classList.remove('active')});this.classList.add('active')})});
+var saveBtn=document.getElementById('custSave');if(saveBtn)saveBtn.addEventListener('click',function(){var cb=G('custBkmBar');var ch=G('custHomeBtn');settings.showBkmBar=!!cb&&cb.checked;settings.showHomeBtn=!!ch&&ch.checked;saveSettings();var bkm=G('bookmarksBar');if(bkm){if(settings.showBkmBar)bkm.classList.remove('hidden');else bkm.classList.add('hidden')}var hb=G('btnHome');if(hb)hb.style.display=settings.showHomeBtn?'':'none';toast('自定义设置已保存','success');ov.remove()})
+}
+
+function showHelp(){
+var page=G('page_'+activeTabId);if(!page)return;
+page.innerHTML='<div style="padding:40px;max-width:640px;margin:0 auto"><h1 style="font-size:28px;font-weight:300;color:var(--text);margin-bottom:28px">帮助和反馈</h1><div style="background:var(--bg3);border-radius:12px;padding:22px;margin-bottom:16px"><h3 style="font-size:15px;color:var(--text);margin-bottom:10px">关于 FL Browser</h3><p style="font-size:13px;color:var(--text2);line-height:1.7">FL Browser 版本 1.0.0<br>基于 Electron 构建的现代化网页浏览器<br>支持标签页管理、收藏夹、历史记录、下载管理、密码管理、阅读模式、大声朗读、网页捕获等功能</p></div><div style="background:var(--bg3);border-radius:12px;padding:22px;margin-bottom:16px"><h3 style="font-size:15px;color:var(--text);margin-bottom:10px">联系我们</h3><p style="font-size:13px;color:var(--text2);line-height:1.7">如有任何问题或建议，请发送邮件至：<br><a href="mailto:fenglijituan@qq.com" style="color:var(--accent);font-weight:500">fenglijituan@qq.com</a></p></div><div style="background:var(--bg3);border-radius:12px;padding:22px;margin-bottom:16px"><h3 style="font-size:15px;color:var(--text);margin-bottom:10px">键盘快捷键</h3>'+['Ctrl+T：新建标签页','Ctrl+W：关闭标签页','F11：全屏切换','F12：开发者工具','Ctrl+F：在页面上查找','Ctrl+H：打开历史记录','Ctrl+J：打开下载','Ctrl+Shift+N：新建InPrivate窗口','Ctrl+Shift+Del：删除浏览数据','Ctrl+Shift+U：大声朗读'].map(function(k){return'<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text)"><span>'+k.split('：')[0]+'</span><span style="color:var(--text3)">'+k.split('：')[1]+'</span></div>'}).join('')+'</div><div style="background:var(--bg3);border-radius:12px;padding:22px"><h3 style="font-size:15px;color:var(--text);margin-bottom:10px">反馈</h3><p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">发现Bug或有改进建议？欢迎通过邮件反馈，我们会认真对待每一条反馈。</p><button class="btn-primary" onclick="toast(\'感谢您的反馈！请发送邮件至 fenglijituan@qq.com\',\'success\')">发送反馈</button></div></div>';
+var tab=tabs.find(function(t){return t.id===activeTabId});if(tab){tab.type='page';tab.title='帮助和反馈';renderTabs()}
+}
+
+function showTabActions(){toast('标签页操作：可在此管理所有标签页','info')}
+
+function applyTheme(name){
+document.body.classList.remove('light','private','ocean','forest','sunset','neon','custom');
+if(name==='浅色')document.body.classList.add('light');
+else if(name==='深色'){}
+else if(['ocean','forest','sunset','neon'].includes(name))document.body.classList.add(name);
+else if(name==='custom'){document.body.classList.add('custom');applyCustomColors()}
+if(name==='private')document.body.classList.add('private');
+var icon=G('bkmSvg');if(icon&&isBookmarked){icon.style.fill='#f9e2af'}
+updateBkmBar()
+}
+function applyCustomColors(){
+var accent=settings.customAccent||'#89b4fa';
+var bg=settings.customBg||'#1e1e2e';
+var text=settings.customText||'#cdd6f4';
+var bg2=adjustColor(bg,-20);
+var bg3=adjustColor(bg,15);
+var bg4=adjustColor(bg,30);
+var bg5=adjustColor(bg,50);
+var text2=adjustColor(text,-25);
+var text3=adjustColor(text,-50);
+var border=adjustColor(bg,40);
+document.documentElement.style.setProperty('--custom-accent',accent);
+document.documentElement.style.setProperty('--custom-bg',bg);
+document.documentElement.style.setProperty('--custom-bg2',bg2);
+document.documentElement.style.setProperty('--custom-bg3',bg3);
+document.documentElement.style.setProperty('--custom-bg4',bg4);
+document.documentElement.style.setProperty('--custom-bg5',bg5);
+document.documentElement.style.setProperty('--custom-text',text);
+document.documentElement.style.setProperty('--custom-text2',text2);
+document.documentElement.style.setProperty('--custom-text3',text3);
+document.documentElement.style.setProperty('--custom-border',border);
+}
+function adjustColor(hex,percent){
+var num=parseInt(hex.replace('#',''),16);
+var amt=Math.round(2.55*percent);
+var R=(num>>16)+amt;
+var G=(num>>8&0x00FF)+amt;
+var B=(num&0x0000FF)+amt;
+return '#'+(0x1000000+
+(Math.max(0,Math.min(255,R))*0x10000)+
+(Math.max(0,Math.min(255,G))*0x100)+
+Math.max(0,Math.min(255,B))).toString(16).slice(1)
+}
+function setCustomColor(type,color){
+settings['custom'+type.charAt(0).toUpperCase()+type.slice(1)]=color;
+saveSettings();
+settings.theme='custom';
+applyTheme('custom');
+toast('自定义颜色已应用','success')
+}
+window._flResetCustomColors=function(){
+settings.customAccent='#89b4fa';
+settings.customBg='#1e1e2e';
+settings.customText='#cdd6f4';
+saveSettings();
+settings.theme='深色';
+applyTheme('深色');
+toast('颜色已重置','info')
+}
+
+function toggleVerticalTabs(){
+settings.verticalTabs=!settings.verticalTabs;saveSettings();
+var sb=G('verticalTabsSidebar');if(sb){if(settings.verticalTabs)sb.classList.add('show');else sb.classList.remove('show')}
+updateVerticalTabs()
+}
+
+function updateVerticalTabs(){
+var list=G('verticalTabsList');if(!list||!settings.verticalTabs)return;
+list.innerHTML=tabs.map(function(t){return'<div class="sidebar-tab'+(t.id===activeTabId?' active':'')+'" data-sid="'+t.id+'">'+faviconChar(t)+' <span class="sidebar-tab-title">'+escHtml(t.title)+'</span></div>'}).join('');
+list.querySelectorAll('.sidebar-tab').forEach(function(el){el.addEventListener('click',function(){switchTab(this.dataset.sid)})})
+}
+
+function updateBkmBar(){
+var bar=G('bookmarksBar');if(!bar||bar.classList.contains('hidden'))return;
+var items=bookmarks.slice(0,15);
+bar.innerHTML=items.map(function(b,i){return'<span class="bkm-item" data-burl="'+escHtml(b.url)+'"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--yellow)" style="width:14px;height:14px;flex-shrink:0"><path d="M17 3H7a2 2 0 00-2 2v16l7-3 7 3V5a2 2 0 00-2-2z"/></svg> '+escHtml(b.title||b.url)+'<span class="bkm-delete" data-bidx="'+i+'"><svg width="10" height="10" viewBox="0 0 24 24" fill="var(--red)"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></span></span>'}).join('');
+bar.querySelectorAll('.bkm-item').forEach(function(el){el.addEventListener('click',function(e){if(e.target.closest('.bkm-delete')){e.stopPropagation();var idx=parseInt(e.target.closest('.bkm-delete').dataset.bidx);if(!isNaN(idx)){bookmarks.splice(idx,1);saveSettings();updateBkmBar();toast('已删除收藏','info')}}else{navigate(this.dataset.burl)}})})
+}
+
+function bindSettingsEvents(page){
+page.querySelectorAll('.settings-nav-item').forEach(function(el){el.addEventListener('click',function(){var sec=this.dataset.section;page.querySelectorAll('.settings-nav-item').forEach(function(e){e.classList.remove('active')});this.classList.add('active');page.querySelectorAll('.settings-panel').forEach(function(e){e.classList.remove('active')});var panel=page.querySelector('[data-panel="'+sec+'"]');if(panel)panel.classList.add('active')})});
+var startupRadios=page.querySelectorAll('input[name="startup"]');
+startupRadios.forEach(function(r){r.addEventListener('change',function(){settings.startup=this.value;saveSettings();var sI=page.querySelector('#suInput');if(sI)sI.style.display=this.value==='specific'?'':'none'})});
+var sI=page.querySelector('#suInput');if(sI)sI.addEventListener('input',function(){settings.startupUrl=this.value;saveSettings()});
+var seS=page.querySelector('#seSelect');if(seS)seS.addEventListener('change',function(){settings.se=this.value;saveSettings();toast('搜索引擎已切换为 '+this.value,'success')});
+var tgSmart=page.querySelector('#tgSmart');if(tgSmart)tgSmart.addEventListener('click',function(){this.classList.toggle('on');settings.smartscreen=this.classList.contains('on');saveSettings()});
+var tgAd=page.querySelector('#tgAdblock');if(tgAd)tgAd.addEventListener('click',function(){this.classList.toggle('on');settings.adblock=this.classList.contains('on');saveSettings()});
+var tgL=page.querySelector('#tgLevel');if(tgL)tgL.addEventListener('change',function(){settings.trackingLevel=this.value;saveSettings()});
+var tgEff=page.querySelector('#tgEffMode');if(tgEff)tgEff.addEventListener('click',function(){this.classList.toggle('on');settings.efficiencyMode=this.classList.contains('on');saveSettings()});
+var thOpts=page.querySelectorAll('.theme-option');thOpts.forEach(function(el){el.addEventListener('click',function(){settings.theme=this.dataset.theme;applyTheme(settings.theme);saveSettings();thOpts.forEach(function(e){e.classList.remove('active')});this.classList.add('active')})});
+var zS=page.querySelector('#zoomSelect');if(zS)zS.addEventListener('change',function(){zoomPct=parseInt(this.value);var w=getWebview(activeTabId);if(w)try{w.setZoomFactor(zoomPct/100)}catch(e){}updateZoomDisplay();toast('默认缩放: '+zoomPct+'%','info')});
+var uB=page.querySelector('#btnCheckUpdate');if(uB)uB.addEventListener('click',checkForUpdates);
+}
+
+function bindExtensionsEvents(page){
+page.querySelectorAll('.ext-link-btn').forEach(function(el){el.addEventListener('click',function(){navigate(this.dataset.url)})})
+}
+
+function settingsHTML(){
+var se=settings.se,ss=settings.startup,st=settings.theme,su=settings.startupUrl;
+var h='<div class="settings"><div class="settings-sidebar"><div class="settings-logo">FL Browser</div><div class="settings-nav">';
+['general','privacy','appearance','system','about'].forEach(function(s,i){var labels=['常规','隐私、搜索和服务','外观','系统和性能','关于 FL Browser'];h+='<button class="settings-nav-item'+(i===0?' active':'')+'" data-section="'+s+'"><span>'+labels[i]+'</span></button>';if(i===3)h+='<div class="settings-nav-divider"></div>'});
+h+='</div></div><div class="settings-main"><div class="settings-header"><h1>设置</h1></div>';
+h+='<div class="settings-panel active" data-panel="general"><div class="settings-section"><div class="settings-section-title">启动时</div><div class="settings-section-desc">选择浏览器启动时打开的页面</div><div class="settings-card">'+
+'<div class="setting-row"><label class="setting-option"><input type="radio" name="startup" value="newtab" '+(ss==='newtab'?'checked':'')+'> 新标签页</label></div>'+
+'<div class="setting-row"><label class="setting-option"><input type="radio" name="startup" value="specific" '+(ss==='specific'?'checked':'')+'> 特定页面</label> <input type="text" class="setting-input" id="suInput" placeholder="https://" value="'+escAttr(su)+'" style="'+(ss!=='specific'?'display:none':'')+'"></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">搜索引擎</div><div class="settings-section-desc">在地址栏中使用的默认搜索引擎</div><div class="settings-card"><div class="setting-row"><div class="setting-info"><div class="setting-label">默认搜索引擎</div><div class="setting-desc">当前：'+escHtml(se)+'</div></div><select class="setting-select" id="seSelect"><option value="Google" '+(se==='Google'?'selected':'')+'>Google</option><option value="百度" '+(se==='百度'?'selected':'')+'>百度</option><option value="Bing" '+(se==='Bing'?'selected':'')+'>Bing</option><option value="DuckDuckGo" '+(se==='DuckDuckGo'?'selected':'')+'>DuckDuckGo</option></select></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">导入和导出</div><div class="settings-card">'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">导入浏览器数据</div><div class="setting-desc">从其他浏览器导入书签、历史记录等</div></div><button class="btn-secondary" onclick="toast(\'导入功能开发中\',\'info\')">导入</button></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">默认浏览器</div><div class="settings-card"><div class="setting-row"><div class="setting-info"><div class="setting-label">设为默认浏览器</div><div class="setting-desc">在系统设置中将 FL Browser 设为默认浏览器</div></div><button class="btn-secondary" onclick="toast(\'请在系统设置中更改默认浏览器\',\'info\')">设为默认</button></div></div></div></div>';
+h+='<div class="settings-panel" data-panel="privacy"><div class="settings-section"><div class="settings-section-title">安全</div><div class="settings-card">'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">SmartScreen</div><div class="setting-desc">帮助保护您免受恶意网站的侵害</div></div><div class="toggle-switch'+(settings.smartscreen?' on':'')+'" id="tgSmart"></div></div>'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">阻止侵入式广告</div><div class="setting-desc">阻止网站显示侵入式广告</div></div><div class="toggle-switch'+(settings.adblock?' on':'')+'" id="tgAdblock"></div></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">跟踪防护</div><div class="settings-section-desc">选择跟踪防护级别</div><div class="settings-card">'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">防护级别</div></div><select class="setting-select" id="tgLevel"><option value="basic" '+(settings.trackingLevel==='basic'?'selected':'')+'>基本</option><option value="balanced" '+(settings.trackingLevel==='balanced'?'selected':'')+'>均衡（推荐）</option><option value="strict" '+(settings.trackingLevel==='strict'?'selected':'')+'>严格</option></select></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">清除浏览数据</div><div class="settings-card"><button class="btn-primary" onclick="window._flShowClear()">选择要清除的内容</button></div></div></div>';
+h+='<div class="settings-panel" data-panel="appearance"><div class="settings-section"><div class="settings-section-title">主题</div><div class="settings-section-desc">选择浏览器的整体外观</div><div class="settings-card"><div class="theme-options">'+
+'<div class="theme-option'+(st==='浅色'?' active':'')+'" data-theme="浅色"><div class="theme-preview" style="background:linear-gradient(135deg,#eff1f5,#ccd0da)"></div><span>浅色</span></div>'+
+'<div class="theme-option'+(st==='深色'?' active':'')+'" data-theme="深色"><div class="theme-preview" style="background:linear-gradient(135deg,#1e1e2e,#252536)"></div><span>深色</span></div>'+
+'<div class="theme-option'+(st==='ocean'?' active':'')+'" data-theme="ocean"><div class="theme-preview" style="background:linear-gradient(135deg,#0f172a,#0ea5e9)"></div><span>海洋蓝</span></div>'+
+'<div class="theme-option'+(st==='forest'?' active':'')+'" data-theme="forest"><div class="theme-preview" style="background:linear-gradient(135deg,#052e16,#22c55e)"></div><span>森林绿</span></div>'+
+'<div class="theme-option'+(st==='sunset'?' active':'')+'" data-theme="sunset"><div class="theme-preview" style="background:linear-gradient(135deg,#450a0a,#ef4444)"></div><span>日落红</span></div>'+
+'<div class="theme-option'+(st==='neon'?' active':'')+'" data-theme="neon"><div class="theme-preview" style="background:linear-gradient(135deg,#0f0f23,#8b5cf6)"></div><span>霓虹紫</span></div></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">自定义颜色</div><div class="settings-card"><div style="display:flex;gap:16px;flex-wrap:wrap;padding:12px"><div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">强调色</label><input type="color" id="customAccent" value="#89b4fa" style="width:60px;height:32px;border:none;border-radius:6px;cursor:pointer"></div><div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">背景色</label><input type="color" id="customBg" value="#1e1e2e" style="width:60px;height:32px;border:none;border-radius:6px;cursor:pointer"></div><div><label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">文字色</label><input type="color" id="customText" value="#cdd6f4" style="width:60px;height:32px;border:none;border-radius:6px;cursor:pointer"></div></div><button class="btn-secondary" style="margin:12px" onclick="window._flResetCustomColors()">重置自定义颜色</button></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">页面缩放</div><div class="settings-card"><div class="setting-row"><div class="setting-info"><div class="setting-label">默认缩放</div></div><select class="setting-select" id="zoomSelect"><option value="75">75%</option><option value="90">90%</option><option value="100" selected>100%</option><option value="125">125%</option><option value="150">150%</option></select></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">收藏夹栏</div><div class="settings-card"><div class="setting-row"><div class="setting-info"><div class="setting-label">始终显示收藏夹栏</div></div><div class="toggle-switch'+(settings.showBkmBar?' on':'')+'" onclick="this.classList.toggle(\'on\');settings.showBkmBar=this.classList.contains(\'on\');saveSettings()"></div></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">极简模式</div><div class="settings-section-desc">隐藏非必要UI元素，获得更专注的浏览体验</div><div class="settings-card">'+
+'<div class="settings-section"><div class="settings-section-title">极简模式</div><div class="settings-section-desc">隐藏非必要UI元素，获得更专注的浏览体验</div><div class="settings-card"><div class="setting-row"><div class="setting-info"><div class="setting-label">极简模式</div><div class="setting-desc">自动隐藏工具栏和标签栏，鼠标悬停时显示</div></div><div class="toggle-switch" onclick="this.classList.toggle(\'on\');var s=this.classList.contains(\'on\');toast(\'极简模式：\'+(s?\'开启\':\'关闭\'),\'info\')"></div></div></div></div></div>';
+h+='<div class="settings-panel" data-panel="system"><div class="settings-section"><div class="settings-section-title">性能</div><div class="settings-card">'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">效率模式</div><div class="setting-desc">延长电池续航并减少能耗</div></div><div class="toggle-switch'+(settings.efficiencyMode?' on':'')+'" id="tgEffMode"></div></div>'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">硬件加速</div><div class="setting-desc">使用GPU加速渲染页面</div></div><div class="toggle-switch on"></div></div>'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">后台运行</div><div class="setting-desc">关闭浏览器后继续运行部分扩展</div></div><div class="toggle-switch"></div></div></div></div>'+
+'<div class="settings-section"><div class="settings-section-title">语言和区域</div><div class="settings-card">'+
+'<div class="setting-row"><div class="setting-info"><div class="setting-label">显示语言</div></div><select class="setting-select"><option value="zh-CN">中文（简体）</option><option value="en-US">English</option></select></div></div></div></div>';
+h+='<div class="settings-panel" data-panel="about"><div class="settings-section"><div class="settings-section-title">关于 FL Browser</div><div class="settings-card"><div style="margin-bottom:16px"><div style="font-size:14px;color:var(--text);margin-bottom:8px">版本 1.0.0</div><div style="font-size:13px;color:var(--text3)">FL Browser 是基于 Electron 构建的现代化浏览器</div></div><button class="btn-secondary" id="btnCheckUpdate">检查更新</button></div></div></div>';
+h+='</div></div></div>';return h
+}
+window._flShowClear=function(){showClearData()};
+
+function newtabHTML(){
+var ql=[{name:'Google',url:'https://www.google.com',bg:'linear-gradient(135deg,#4285f4,#ea4335)',label:'G'},{name:'百度',url:'https://www.baidu.com',bg:'#231919',label:'B'},{name:'Bing',url:'https://www.bing.com',bg:'linear-gradient(135deg,#0084ff,#00d4ff)',label:'Bi'},{name:'GitHub',url:'https://github.com',bg:'#333',label:'Gi'},{name:'YouTube',url:'https://www.youtube.com',bg:'#f00',label:'Y'},{name:'B站',url:'https://www.bilibili.com',bg:'#fb7299',label:'B'},{name:'知乎',url:'https://www.zhihu.com',bg:'#0066ff',label:'知'},{name:'微博',url:'https://www.weibo.com',bg:'#e6162d',label:'微'}];
+var ts=visitHistory.filter(function(v){return v.visits>1}).sort(function(a,b){return b.visits-a.visits}).slice(0,8).map(function(v){return{name:v.title||v.url,url:v.url}});
+var items=ts.length>0?ts:ql.slice(0,8);
+return'<div class="newtab"><div class="newtab-logo">FL Browser</div><div class="newtab-subtitle">快速、安全、现代化的浏览体验</div><div class="search-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--text3)" style="margin-right:8px"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input type="text" class="search-input" placeholder="搜索或输入网址" autocomplete="off"></div><div class="quick-links">'+items.map(function(q){return'<div class="quick-link" data-url="'+q.url+'"><div class="quick-link-icon" style="background:'+q.bg+'">'+q.label.slice(0,2)+'</div><div class="quick-link-name">'+q.name+'</div></div>'}).join('')+'<div class="quick-link" onclick="window._flAddQL()"><div class="quick-link-add">+</div><div class="quick-link-name">添加</div></div></div></div>'
+}
+window._flAddQL=function(){toast('点击快速链接可自定义，长按删除','info')};
+
+function historyHTML(){
+var items=historyItems.slice().reverse();
+if(items.length===0){
+return'<div style="padding:24px"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500">历史记录</h2><div style="color:var(--text3);text-align:center;padding:48px">暂无浏览历史<br><span style="font-size:12px">开始浏览网页后，历史记录将显示在这里</span></div></div>';
+}
+var grouped={};items.forEach(function(item){var d=new Date(item.date);var key=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();if(!grouped[key])grouped[key]={label:formatDateLabel(d),items:[]};grouped[key].items.push(item)});
+var h=Object.keys(grouped).map(function(key){var g=grouped[key];return'<div class="history-group"><div class="history-group-label">'+g.label+'</div>'+g.items.map(function(h,i){var origIdx=historyItems.indexOf(h);return'<div class="history-item" data-idx="'+origIdx+'"><div class="history-item-content" onclick="navigate(\''+escAttr(h.url)+'\')"><div class="history-item-title">'+escHtml(h.title||h.url)+'</div><div class="history-item-url">'+escHtml(h.url)+'</div></div><div class="history-item-time">'+new Date(h.date).toLocaleTimeString()+'</div><button class="history-item-delete" onclick="event.stopPropagation();window._flDelHist('+origIdx+')">删除</button></div>'}).join('')+'</div>'}).join('');
+return'<div style="padding:24px"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500">历史记录</h2><div class="history-actions"><button class="btn-danger" style="padding:6px 14px;font-size:12px" onclick="window._flClearHist()">清空全部</button><span style="font-size:12px;color:var(--text3);margin-left:12px">共 '+historyItems.length+' 条记录</span></div>'+h+'</div>'}
+function formatDateLabel(d){var today=new Date();today.setHours(0,0,0,0);var date=new Date(d);date.setHours(0,0,0,0);var diff=(today-date)/(1000*60*60*24);if(diff===0)return'今天';if(diff===1)return'昨天';if(diff<7)return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（周'+'日一二三四五六'.charAt(d.getDay())+'）';return d.getFullYear()+'年'+(d.getMonth()+1)+'月'}
+window._flDelHist=function(i){if(i>=0&&i<historyItems.length){historyItems.splice(i,1);try{localStorage.setItem('fl_vhist',JSON.stringify(historyItems))}catch(e){}toast('已删除记录','info');createTab('history')}};
+window._flClearHist=function(){if(confirm('确定要清空所有历史记录吗？')){historyItems=[];try{localStorage.setItem('fl_vhist',JSON.stringify(historyItems))}catch(e){}toast('历史记录已清空','info');createTab('history')}};
+function bookmarksHTML(){var h=bookmarks.length===0?'<div style="color:var(--text3);text-align:center;padding:48px">暂无收藏<br><span style="font-size:12px">点击地址栏中的星标图标添加收藏</span></div>':bookmarks.map(function(b,i){return'<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border-radius:10px;margin-bottom:6px"><span style="cursor:pointer" onclick="navigate(\''+escAttr(b.url)+'\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--yellow)"><path d="M17 3H7a2 2 0 00-2 2v16l7-3 7 3V5a2 2 0 00-2-2z"/></svg> <span style="font-size:13px;color:var(--text)">'+escHtml(b.title||b.url)+'</span></span><span style="font-size:11px;color:var(--text3);margin-left:auto">'+escHtml(b.url)+'</span><button class="btn-danger" style="padding:2px 8px;font-size:11px;margin-left:8px" onclick="window._flDelBkm('+i+')">删除</button></div>'}).join('');return'<div style="padding:24px"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500">收藏夹</h2>'+h+'</div>'}
+window._flDelBkm=function(i){bookmarks.splice(i,1);localStorage.setItem('fl_bkm',JSON.stringify(bookmarks));toast('已删除收藏','success');createTab('bookmarks')};
+function downloadsHTML(){var dl=downloadsList.length===0?'<div style="color:var(--text3);text-align:center;padding:48px">暂无下载记录<br><span style="font-size:12px">下载的文件将显示在这里</span></div>':downloadsList.map(function(d,i){return'<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg3);border-radius:10px;margin-bottom:8px"><div style="width:36px;height:36px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--accent)"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg></div><div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(d.name)+'</div><div style="font-size:11px;color:var(--text3)">'+escHtml(d.path)+'</div></div><div style="display:flex;gap:6px"><button class="btn-secondary" style="padding:4px 10px;font-size:12px" onclick="window._flOpenDl('+i+')">打开</button><button class="btn-danger" style="padding:4px 10px;font-size:12px" onclick="window._flDelDl('+i+')">删除</button></div></div>'}).join('');return'<div style="padding:24px"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500">下载</h2>'+dl+'</div>'}
+window._flOpenDl=function(i){if(downloadsList[i]&&downloadsList[i].path){try{require('electron').shell.openPath(downloadsList[i].path);toast('已打开文件','success')}catch(e){toast('无法打开文件','warning')}}};
+window._flDelDl=function(i){downloadsList.splice(i,1);toast('已删除记录','info');createTab('downloads')};
+var extensions=[],extStores=[{name:'Chrome Web Store',url:'https://chrome.google.com/webstore/category/extensions',icon:'C'},{name:'Microsoft Edge Add-ons',url:'https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home',icon:'E'},{name:'Firefox Add-ons',url:'https://addons.mozilla.org/zh-CN/firefox/',icon:'F'}];
+function extensionsHTML(){var extList=extensions.length===0?'<div style="color:var(--text3);text-align:center;padding:24px"><svg width="48" height="48" viewBox="0 0 24 24" fill="var(--text3)" style="margin-bottom:12px"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.1 11.9 1 10.5 1S8 2.1 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.4 0 2.5 1.1 2.5 2.5s-1.1 2.5-2.5 2.5H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5V22H17c1.1 0 2-.9 2-2v-4h1.5c1.4 0 2.5-1.1 2.5-2.5S21.9 11 20.5 11z"/></svg><div style="font-size:14px;color:var(--text);margin-bottom:8px">暂无已安装的扩展程序</div><div style="font-size:12px;color:var(--text3)">从扩展商店获取扩展以增强浏览体验</div></div>':extensions.map(function(e,i){return'<div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg3);border-radius:12px;margin-bottom:8px"><div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#4285f4,#ea4335);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">'+(e.icon||'E')+'</div><div style="flex:1"><div style="font-size:13px;color:var(--text)">'+escHtml(e.name)+'</div><div style="font-size:11px;color:var(--text3)">'+escHtml(e.version||'')+'</div></div><button class="btn-secondary" style="padding:4px 12px;font-size:12px" onclick="window._flToggleExt(\''+escAttr(e.id)+'\')">'+(e.enabled?'禁用':'启用')+'</button><button class="btn-danger" style="padding:4px 12px;font-size:12px" onclick="window._flUninstallExt(\''+escAttr(e.id)+'\')">卸载</button></div>'}).join('');var storeBtns=extStores.map(function(s){return'<button class="ext-store-btn" data-url="'+s.url+'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:all .2s;cursor:pointer"><div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#89b4fa,#74c7ec);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px">'+s.icon+'</div><span style="font-size:12px;color:var(--text)">'+s.name+'</span></button>'}).join('');return'<div style="padding:24px;max-width:700px;margin:0 auto"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500">扩展程序</h2><div style="background:var(--bg3);border-radius:12px;padding:22px;margin-bottom:16px"><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">扩展商店</div><div style="display:flex;gap:12px">'+storeBtns+'</div></div><div style="background:var(--bg3);border-radius:12px;padding:16px;margin-bottom:16px">'+extList+'</div><div style="background:var(--bg3);border-radius:12px;padding:18px"><div class="setting-row"><div class="setting-info"><div class="setting-label">开发者模式</div><div class="setting-desc">允许加载未打包的扩展程序</div></div><div class="toggle-switch'+(settings.devMode?' on':'')+'" onclick="this.classList.toggle(\'on\');settings.devMode=this.classList.contains(\'on\');saveSettings()"></div></div><button class="btn-secondary" style="margin-top:12px;width:100%" onclick="window._flLoadExt()">加载已解压的扩展程序</button></div></div>'}
+window._flToggleExt=function(extId){
+if(!ELEC||!ELEC.ipcRenderer){toast('IPC不可用','warning');return}
+ELEC.ipcRenderer.invoke('toggle-extension',extId).then(function(res){
+if(res.success){toast(res.enabled?'扩展已启用':'扩展已禁用','info');refreshExtensionsList()}
+else{toast('操作失败: '+res.error,'warning')}
+}).catch(function(e){toast('IPC调用失败: '+e.message,'warning')})
+};
+window._flUninstallExt=function(extId){
+if(!ELEC||!ELEC.ipcRenderer){toast('IPC不可用','warning');return}
+ELEC.ipcRenderer.invoke('remove-extension',extId).then(function(res){
+if(res.success){toast('扩展已卸载','info');refreshExtensionsList()}
+else{toast('卸载失败: '+res.error,'warning')}
+}).catch(function(e){toast('IPC调用失败: '+e.message,'warning')})
+};
+function refreshExtensionsList(){
+if(!ELEC||!ELEC.ipcRenderer)return;
+ELEC.ipcRenderer.invoke('get-all-extensions').then(function(e){
+extensions=e.map(function(ext){return{id:ext.id,name:ext.name,version:ext.version,enabled:true}});
+var tab=tabs.find(function(t){return t.id===activeTabId});
+if(tab&&tab.type==='extensions')renderPage(activeTabId,'extensions')
+}).catch(function(){extensions=[]})
+}
+window._flLoadExt=function(){
+if(!settings.devMode){toast('请先开启开发者模式','warning');return}
+if(!ELEC||!ELEC.ipcRenderer){toast('IPC不可用','warning');return}
+ELEC.ipcRenderer.invoke('show-open-dialog',{properties:['openDirectory'],title:'选择扩展程序目录'}).then(function(res){
+if(!res.canceled&&res.filePaths.length>0){
+var extPath=res.filePaths[0];
+toast('正在加载扩展...','info');
+ELEC.ipcRenderer.invoke('load-extension',extPath).then(function(result){
+if(result.success){toast('扩展 "'+result.name+'" 已安装','success');refreshExtensionsList()}
+else{toast('安装失败: '+result.error,'warning')}
+}).catch(function(e){toast('IPC调用失败: '+e.message,'warning')})
+}
+}).catch(function(e){toast('选择目录失败: '+e.message,'warning')})
+};
+function bindExtensionsEvents(page){page.querySelectorAll('.ext-link-btn').forEach(function(el){el.addEventListener('click',function(){navigate(this.dataset.url)})});page.querySelectorAll('.ext-store-btn').forEach(function(el){el.addEventListener('click',function(){navigate(this.dataset.url)})})}
+function siteinfoHTML(url){var d='';try{d=new URL(url).hostname}catch(e){d=url||'未知'}return'<div style="padding:24px;max-width:600px;margin:0 auto"><h2 style="color:var(--text);margin-bottom:20px;font-weight:500">站点信息</h2><div style="background:var(--bg3);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px"><div style="width:60px;height:60px;background:var(--accent);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="var(--bg)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div><div style="font-size:15px;font-weight:600;color:var(--text)">站点连接信息</div><div style="font-size:12px;color:var(--text3);margin-top:4px;word-break:break-all">'+escHtml(d)+'</div></div><div style="background:var(--bg3);border-radius:12px;padding:16px"><div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:12px">权限设置</div><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text)">位置信息</span><span class="security-panel-status blocked">已阻止</span></div><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text)">摄像头</span><span class="security-panel-status blocked">已阻止</span></div><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text)">麦克风</span><span class="security-panel-status blocked">已阻止</span></div><div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-size:13px;color:var(--text)">通知</span><span class="security-panel-status blocked">已阻止</span></div></div></div>'}
+function collectionsHTML(){var list=collections.length===0?'<div style="color:var(--text3);text-align:center;padding:32px">集锦为空<br><span style="font-size:12px">从菜单将网页添加到集锦</span></div>':collections.map(function(c,i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-size:13px;color:var(--text)">'+escHtml(c.title)+'</div><div style="font-size:11px;color:var(--text3)">'+escHtml(c.url)+'</div></div><button class="btn-secondary" style="padding:4px 10px;font-size:12px" onclick="window._flOpenCol('+i+')">打开</button></div>'}).join('');return'<div style="padding:24px"><h2 style="color:var(--text);margin-bottom:16px;font-weight:500">集锦</h2><div style="background:var(--bg3);border-radius:12px;padding:18px;margin-bottom:16px">'+list+'<div style="display:flex;gap:8px;margin-top:14px"><button class="btn-primary" onclick="window._flAddCol()">添加当前页面</button><button class="btn-secondary" onclick="window._flClearCol()">清空集锦</button></div></div></div>'}
+function getWebview(id){return G('wv_'+id)}
+function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function escAttr(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function checkForUpdates(){var ov=document.createElement('div');ov.className='overlay';ov.innerHTML='<div class="dialog" style="text-align:center"><h2>检查更新</h2><div style="color:var(--text3);font-size:13px;margin-bottom:18px">正在检查最新版本…</div><div style="width:100%;height:4px;background:var(--border);border-radius:2px;margin-bottom:18px"><div id="upBar" style="width:0;height:100%;background:var(--accent);border-radius:2px;transition:width 1s"></div></div><div style="color:var(--text3);font-size:12px" id="upMsg">正在连接更新服务器…</div></div>';document.body.appendChild(ov);setTimeout(function(){var b=G('upBar');if(b)b.style.width='45%';var m=G('upMsg');if(m)m.textContent='验证版本中…'},1200);setTimeout(function(){var b=G('upBar');if(b)b.style.width='100%';var m=G('upMsg');if(m)m.textContent='完成';setTimeout(function(){ov.innerHTML='<div class="dialog" style="text-align:center"><div style="font-size:48px;margin-bottom:12px"><svg width="48" height="48" viewBox="0 0 24 24" fill="var(--green)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><h2>已是最新版本</h2><div style="color:var(--text3);font-size:13px">FL Browser 1.0.0 已是最新</div><div class="dialog-actions" style="justify-content:center;margin-top:20px"><button class="btn-primary" onclick="this.closest(\'.overlay\').remove()">确定</button></div></div>'},800)},4800);ov.addEventListener('click',function(e){if(e.target===ov)ov.remove()})}
+window._flCheckUpdate=checkForUpdates;
+
+function addToHistory(url){
+var title=url;try{var ft=tabs.find(function(t){return t.id===activeTabId});if(ft&&ft.title)title=ft.title}catch(e){}
+var existing=visitHistory.find(function(v){return v.url===url});
+if(existing){existing.visits=(existing.visits||1)+1;existing.date=Date.now()}
+else{visitHistory.push({url:url,title:title,visits:1,date:Date.now()})}
+if(visitHistory.length>200)visitHistory=visitHistory.slice(-200);
+try{localStorage.setItem('fl_vhist',JSON.stringify(visitHistory))}catch(e){}
+historyItems.push({url:url,title:title,date:Date.now()});
+}
+
+function getTopSites(){return visitHistory.filter(function(v){return v.visits>1}).sort(function(a,b){return b.visits-a.visits}).slice(0,8)}
+
+function showSuggestions(input){
+var sug=G('urlSuggestions');if(!sug)return;
+if(!input||input.length<1){hideSuggestions();return}
+var inputLower=input.toLowerCase();
+var matches=visitHistory.filter(function(v){return v.url.toLowerCase().indexOf(inputLower)!==-1||v.title.toLowerCase().indexOf(inputLower)!==-1}).sort(function(a,b){return b.visits-a.visits}).slice(0,6);
+if(matches.length===0){hideSuggestions();return}
+sug.innerHTML=matches.map(function(m,i){return'<div class="suggestion-item'+(i===0?' highlighted':'')+'" data-url="'+escAttr(m.url)+'"><span class="sug-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="var(--text3)"><circle cx="12" cy="12" r="10"/></svg></span><span style="flex:1;min-width:0;overflow:hidden"><span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(m.title||m.url)+'</span><span class="sug-url">'+escHtml(m.url)+'</span></span><span style="font-size:10px;color:var(--text3)">'+m.visits+'次</span></div>'}).join('');
+sug.querySelectorAll('.suggestion-item').forEach(function(el){el.addEventListener('click',function(){var u=this.dataset.url;if(u){navigate(u);hideSuggestions()}})});
+sug.classList.add('show');
+}
+
+function hideSuggestions(){var s=G('urlSuggestions');if(s){s.classList.remove('show');s.innerHTML=''}}
+var sugHighlightIdx=-1;
+function navSuggestions(dir){
+var sug=G('urlSuggestions');if(!sug)return;var items=sug.querySelectorAll('.suggestion-item');if(!items.length)return;
+if(dir==='ArrowDown'){sugHighlightIdx=Math.min(sugHighlightIdx+1,items.length-1)}else{sugHighlightIdx=Math.max(sugHighlightIdx-1,0)}
+items.forEach(function(el,i){el.classList.toggle('highlighted',i===sugHighlightIdx)});
+var hi=sug.querySelector('.suggestion-item.highlighted');if(hi){var url=hi.dataset.url;if(url){var ui=G('urlInput');if(ui)ui.value=url}}
+}
+
+init();
+})();
+</script>
+</body>
+</html>

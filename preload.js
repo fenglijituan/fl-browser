@@ -1,0 +1,31 @@
+const { ipcRenderer, contextBridge } = require('electron');
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  minimize: () => ipcRenderer.send('window-minimize'),
+  maximize: () => ipcRenderer.send('window-maximize'),
+  close: () => ipcRenderer.send('window-close'),
+  goBack: () => ipcRenderer.send('go-back'),
+  goForward: () => ipcRenderer.send('go-forward'),
+  reload: () => ipcRenderer.send('reload'),
+  zoomIn: () => ipcRenderer.send('zoom-in'),
+  zoomOut: () => ipcRenderer.send('zoom-out'),
+  zoomReset: () => ipcRenderer.send('zoom-reset'),
+  newTab: () => ipcRenderer.send('new-tab'),
+  toggleMenu: () => ipcRenderer.send('toggle-menu'),
+  toggleFullscreen: () => ipcRenderer.send('toggle-fullscreen'),
+  getBookmarks: () => ipcRenderer.sendSync('get-bookmarks'),
+  getHistory: () => ipcRenderer.sendSync('get-history'),
+  addBookmark: (data) => ipcRenderer.send('add-bookmark', data),
+  removeBookmark: (url) => ipcRenderer.send('remove-bookmark', url),
+  addHistory: (data) => ipcRenderer.send('add-history', data),
+  onNavigate: (callback) => ipcRenderer.on('navigate', (event, url) => callback(url)),
+  onGoBack: (callback) => ipcRenderer.on('go-back', () => callback()),
+  onGoForward: (callback) => ipcRenderer.on('go-forward', () => callback()),
+  onReload: (callback) => ipcRenderer.on('reload', () => callback()),
+  onZoomIn: (callback) => ipcRenderer.on('zoom-in', () => callback()),
+  onZoomOut: (callback) => ipcRenderer.on('zoom-out', () => callback()),
+  onZoomReset: (callback) => ipcRenderer.on('zoom-reset', () => callback()),
+  onNewTab: (callback) => ipcRenderer.on('new-tab', () => callback()),
+  onToggleMenu: (callback) => ipcRenderer.on('toggle-menu', () => callback()),
+  onToggleFullscreen: (callback) => ipcRenderer.on('toggle-fullscreen', () => callback())
+});
