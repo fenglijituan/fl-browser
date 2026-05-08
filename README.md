@@ -277,5 +277,5 @@ MIT License
 ## 📮 联系方式
 
 - 项目主页：[https://github.com/fenglijituan/fl-browser](https://github.com/flbrowser/fl-browser)
-- 问题反馈：sunyihuan9\@gmail.com    fenglijituan\@qq.com
+- 问题反馈：<sunyihuan9@gmail.com>    <fenglijituan@qq.com>
 
